@@ -2387,17 +2387,25 @@ function EventDefinitionsPage({descriptions,setDescriptions}){
         return ms&&mt&&mtype;
       })
       .sort(function(a,b){
-        if(a.tag!==b.tag)return a.tag.localeCompare(b.tag);
-        return sortDir==="asc"?a.label.localeCompare(b.label):b.label.localeCompare(a.label);
+        return a.tag.localeCompare(b.tag);
       });
-  },[search,tagFilter,typeFilter,sortDir]);
+  },[search,tagFilter,typeFilter]);
   const startEdit=function(id){setEditingId(id);setEditDraft(descriptions[id]||"");setTimeout(function(){if(editRef.current)editRef.current.focus();},50);};
   const saveEdit=function(id){setDescriptions(function(prev){const n={...prev};n[id]=editDraft.trim();return n;});setEditingId(null);};
   const groupedByTag=useMemo(()=>{
     const groups={};
     filtered.forEach(ev=>{if(!groups[ev.tag])groups[ev.tag]=[];groups[ev.tag].push(ev);});
+    Object.keys(groups).forEach(tag=>{
+      groups[tag].sort(function(a,b){
+        if(a.type!==b.type){
+          if(a.type==="pageview")return -1;
+          if(b.type==="pageview")return 1;
+        }
+        return sortDir==="asc"?a.label.localeCompare(b.label):b.label.localeCompare(a.label);
+      });
+    });
     return groups;
-  },[filtered]);
+  },[filtered,sortDir]);
   const tagOrder=Object.keys(TAG_COLORS);
   const groupKeys=tagOrder.filter(t=>groupedByTag[t]);
   return (
@@ -2542,7 +2550,7 @@ function PropertyDefinitionsPage({focusPropKey,setFocusPropKey}){
     const ms=search===""||p.label.toLowerCase().includes(search.toLowerCase())||p.key.toLowerCase().includes(search.toLowerCase());
     const mt=typeFilter==="All"||p.type===typeFilter;
     return ms&&mt;
-  }),[search,typeFilter]);
+  }).sort((a,b)=>a.label.localeCompare(b.label)),[search,typeFilter]);
   const startEdit=function(key){setEditingKey(key);setEditDraft(propDescs[key]||"");setTimeout(function(){if(editRef.current)editRef.current.focus();},50);};
   const saveEdit=function(key){setPropDescs(function(prev){return {...prev,[key]:editDraft.trim()};});setEditingKey(null);};
   return(
@@ -2625,7 +2633,10 @@ function TrendsPage({lang,dateRange}){
   const t=useT();
 
   const [seriesList,setSeriesList]=useState([
-    {id:"s1",eventId:"first_page_viewed",color:genSeriesColor(0)},
+    {id:"s1",eventId:"node_connected",color:genSeriesColor(0)},
+    {id:"s2",eventId:"node_connection_failed",color:genSeriesColor(1)},
+    {id:"s3",eventId:"payment_completed",color:genSeriesColor(2)},
+    {id:"s4",eventId:"payment_initiated",color:genSeriesColor(3)},
   ]);
   const [addOpen,setAddOpen]=useState(false);
   const [addSearch,setAddSearch]=useState("");
