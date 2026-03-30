@@ -1757,8 +1757,8 @@ function FunnelPage({panelOpen,setPanel,setTab,descriptions,setDescriptions,setF
   const stepOrderOptions=[{value:"sequential",label:t.orderSequential,desc:"In order; other events allowed between"},{value:"strict",label:t.orderStrict,desc:"Exact order, nothing in between"},{value:"any",label:t.orderAny,desc:"Events may occur in any order"}];
   const convCalcOptions=[{value:"overall",label:t.convOverall,desc:"Each step vs. step 1"},{value:"relative",label:t.convRelative,desc:"Each step vs. previous step"}];
   const convWindowNumberOptions=[{value:1,label:"1"},{value:3,label:"3"},{value:7,label:"7"},{value:14,label:"14"},{value:30,label:"30"},{value:60,label:"60"},{value:90,label:"90"}];
-  const convWindowUnitOptions=[{value:"sessions",label:"Sessions"},{value:"days",label:"Days"},{value:"weeks",label:"Weeks"},{value:"months",label:"Months"}];
-  const warnConvWindowLongSession = aggregateBy === "sessions" && (convWindowLimitUnit !== "sessions" || convWindowLimitNumber > 1);
+  const convWindowUnitOptions=[{value:"seconds",label:"Seconds"},{value:"minutes",label:"Minutes"},{value:"hours",label:"Hours"},{value:"days",label:"Days"},{value:"weeks",label:"Weeks"},{value:"months",label:"Months"}];
+  const warnConvWindowLongSession = false;
 
   const CollapsedSummary=function(){return(
     <div style={{padding:"12px 16px",background:C.bg,borderRadius:7,border:`1px dashed ${C.border2}`,display:"flex",flexWrap:"wrap",gap:6,alignItems:"center"}}>
@@ -1832,7 +1832,6 @@ function FunnelPage({panelOpen,setPanel,setTab,descriptions,setDescriptions,setF
                 <FieldLabel>{t.aggregateBy}</FieldLabel>
                 <CustomSelect value={aggregateBy} onChange={function(v){
                     setAggregateBy(v);
-                    if(v==="sessions"){ setConvWindowLimitNumber(1); setConvWindowLimitUnit("sessions"); }
                     autoRun();
                 }} options={aggOptions}/>
               </div>
