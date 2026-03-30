@@ -1556,7 +1556,7 @@ function FunnelPage({panelOpen,setPanel,setTab,descriptions,setDescriptions,setF
   const [aggregateBy,setAggregateBy]=useState("users");
   const [stepOrder,setStepOrder]=useState("sequential");
   const [convCalc,setConvCalc]=useState("overall");
-  const [convWindowLimitNumber,setConvWindowLimitNumber]=useState(7);
+  const [convWindowLimitNumber,setConvWindowLimitNumber]=useState(14);
   const [convWindowLimitUnit,setConvWindowLimitUnit]=useState("days");
   const [activeFilters,setActiveFilters]=useState([]);
   const [dragIdx,setDragIdx]=useState(null);
@@ -2031,44 +2031,39 @@ function FunnelPage({panelOpen,setPanel,setTab,descriptions,setDescriptions,setF
                 );
               })()}
             </Card>
-            <Card key={`table-${recalcKey}`} style={{padding:0,overflow:"hidden"}} className="recalc-fade">
-              <div style={{padding:"14px 18px 12px",borderBottom:`1px solid ${C.border}`,display:"flex",alignItems:"center",justifyContent:"space-between",gap:9,flexWrap:"wrap"}}>
-                <div>
-                  <div style={{fontSize:14,fontWeight:600,color:C.text}}>{t.stepByStep}</div>
-                  <div style={{fontSize:12,color:C.muted,marginTop:2}}>{breakBy==="none"?"Baseline only":"By "+t.breakdownLabel[breakBy]+" · "+breakdownData.length+" rows"}</div>
-                </div>
-                <div style={{display:"flex",gap:11,flexWrap:"wrap"}}>
-                  {coloredBreakItems.map(function(item){return(
-                    <div key={item.key} style={{display:"flex",alignItems:"center",gap:5}}>
-                      <div style={{width:8,height:8,borderRadius:2,background:item.color}}/>
-                      <span style={{fontSize:11,color:C.text3}}>{lang==="zh"?(item.labelZh||item.label):item.label}</span>
-                    </div>
-                  );})}
-                </div>
+            <Card key={`table-${recalcKey}`} style={{padding:"14px 18px",background:C.card,border:`1px solid ${C.border}`,borderRadius:8}} className="recalc-fade">
+              <div style={{marginBottom:14}}>
+                <div style={{fontSize:14,fontWeight:600,color:C.text}}>{t.stepByStep}</div>
+                <div style={{fontSize:12,color:C.muted,marginTop:2}}>{breakBy==="none"?"Baseline only":"By "+t.breakdownLabel[breakBy]+" · "+breakdownData.length+" rows"}</div>
+              </div>
+              <div style={{display:"flex",gap:11,flexWrap:"wrap",marginBottom:14,paddingBottom:12,borderBottom:`1px solid ${C.border}`}}>
+                {coloredBreakItems.map(function(item){return(
+                  <div key={item.key} style={{display:"flex",alignItems:"center",gap:5}}>
+                    <div style={{width:8,height:8,borderRadius:2,background:item.color}}/>
+                    <span style={{fontSize:11,color:C.text3}}>{lang==="zh"?(item.labelZh||item.label):item.label}</span>
+                  </div>
+                );})}
               </div>
               <div style={{overflowX:"auto"}}>
-                <table style={{borderCollapse:"separate",borderSpacing:0,fontSize:12,whiteSpace:"nowrap",minWidth:"100%"}}>
-                  <thead style={{position:"sticky",top:0,zIndex:5}}>
-                    <tr>
-                      <th rowSpan={2} style={{padding:"9px 16px",textAlign:"left",fontSize:11,fontWeight:600,color:C.muted,position:"sticky",left:0,background:"#f9fafb",zIndex:6,borderRight:`2px solid ${C.border}`,borderBottom:`1px solid ${C.border2}`,minWidth:140}}>{t.breakdown}</th>
-                      <th rowSpan={2} style={{padding:"9px 14px",textAlign:"center",fontSize:11,fontWeight:600,color:C.muted,borderRight:`2px solid ${C.border}`,borderBottom:`1px solid ${C.border2}`,minWidth:90,background:"#f9fafb",position:"sticky",left:140,zIndex:6}}>{t.totalConv}</th>
+                <table style={{borderCollapse:"collapse",fontSize:12,minWidth:"1800px"}}>
+                  <thead>
+                    <tr style={{backgroundColor:"#f9fafb"}}>
+                      <th rowSpan={2} style={{padding:"10px 6px",textAlign:"center",fontSize:11,fontWeight:600,color:C.muted,borderBottom:`2px solid ${C.border}`,borderRight:`2px solid ${C.border}`,whiteSpace:"nowrap",verticalAlign:"middle"}}>{t.breakdown}</th>
+                      <th rowSpan={2} style={{padding:"10px 6px",textAlign:"center",fontSize:11,fontWeight:600,color:C.muted,borderBottom:`2px solid ${C.border}`,whiteSpace:"nowrap",verticalAlign:"middle"}}>Total Conv%</th>
                       {result.map(function(s,si){
-                        const sName=lang==="zh"?s.labelZh:s.label;
                         const col=STEP_COLORS[si%STEP_COLORS.length];
-                        return <th key={si} colSpan={si===0?2:5} style={{padding:"8px 11px",textAlign:"center",fontSize:11,fontWeight:700,color:col,background:"#f9fafb",borderLeft:`2px solid ${col}30`,borderBottom:`1px solid ${C.border2}`}}>
-                          <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:5}}>
-                            <div style={{width:17,height:17,borderRadius:3,background:col,color:"#fff",fontSize:10,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center"}}>{si+1}</div>
-                            <span>{sName.length>13?sName.slice(0,12)+"…":sName}</span>
-                          </div>
+                        const stepName=lang==="zh"?s.labelZh:s.label;
+                        return <th key={si} colSpan={si===0?2:5} style={{padding:"10px 8px",textAlign:"center",fontSize:11,fontWeight:700,color:col,borderBottom:`1px solid ${C.border}`,borderLeft:`2px solid ${col}30`,whiteSpace:"nowrap"}}>
+                          <span style={{display:"inline-block",width:"22px",height:"22px",lineHeight:"22px",textAlign:"center",fontWeight:"800",marginRight:"4px",background:col,color:"#fff",borderRadius:"3px"}}>{si+1}</span>{stepName}
                         </th>;
                       })}
                     </tr>
-                    <tr>
+                    <tr style={{backgroundColor:"#f9fafb"}}>
                       {result.map(function(_,si){
                         const col=STEP_COLORS[si%STEP_COLORS.length];
                         const cols=si===0?["Entered","Conv%"]:["Entered","Conv%","From Prev","Dropped","Avg Time"];
                         return cols.map(function(sc,sci){return(
-                          <th key={"h-"+si+"-"+sc} style={{padding:"6px 9px",textAlign:"center",fontSize:10,fontWeight:500,color:C.muted,background:"#f9fafb",borderLeft:sci===0?`2px solid ${col}30`:"none",borderBottom:`2px solid ${C.border2}`,minWidth:78}}>{sc}</th>
+                          <th key={"h-"+si+"-"+sc} style={{padding:"8px",textAlign:"center",fontSize:10,fontWeight:500,color:C.muted,borderBottom:`2px solid ${C.border}`,borderLeft:sci===0?`2px solid ${col}30`:"none",whiteSpace:"nowrap"}}>{sc}</th>
                         );});
                       })}
                     </tr>
@@ -2078,39 +2073,38 @@ function FunnelPage({panelOpen,setPanel,setTab,descriptions,setDescriptions,setF
                       const s1=row.stepData[0]?row.stepData[0].val:1;
                       const isBase=row.key==="all";
                       const rowBg=isBase?"#f0f6ff":(ri%2===0?C.card:"#fafafa");
-                      return <tr key={row.key}>
-                        <td style={{padding:"10px 16px",position:"sticky",left:0,background:rowBg,zIndex:2,borderRight:`2px solid ${C.border}`,borderBottom:`1px solid ${C.border}`}}>
-                          <div style={{display:"flex",alignItems:"center",gap:7}}>
-                            <div style={{width:9,height:9,borderRadius:2,background:row.color,flexShrink:0}}/>
-                            <span style={{fontSize:12,fontWeight:isBase?700:400,color:isBase?C.accent:C.text}}>{lang==="zh"?(row.labelZh||row.label):row.label}</span>
-                            {isBase&&<span style={{fontSize:9,padding:"1px 5px",borderRadius:3,background:C.accentLight,color:C.accent,fontWeight:700}}>ALL</span>}
+                      return <tr key={row.key} style={{backgroundColor:rowBg}}>
+                        <td style={{padding:"10px 6px",fontSize:12,color:C.text,borderBottom:`1px solid ${C.border}`,borderRight:`2px solid ${C.border}`,whiteSpace:"nowrap"}}>
+                          <div style={{display:"flex",alignItems:"center",gap:6}}>
+                            <div style={{width:8,height:8,borderRadius:2,background:row.color,flexShrink:0}}/>
+                            <span style={{fontWeight:isBase?700:400}}>{lang==="zh"?(row.labelZh||row.label):row.label}</span>
+                            {isBase&&<span style={{fontSize:9,padding:"2px 6px",borderRadius:3,background:C.accentLight,color:C.accent,fontWeight:700}}>ALL</span>}
                           </div>
                         </td>
-                        <td style={{padding:"10px 14px",textAlign:"center",position:"sticky",left:140,background:rowBg,zIndex:2,borderRight:`2px solid ${C.border}`,borderBottom:`1px solid ${C.border}`}}>
-                          <div style={{fontSize:13,fontWeight:700,color:row.totalConvPct>=20?C.success:row.totalConvPct>=10?C.accent:row.totalConvPct>=5?C.warn:C.danger}}>{row.totalConvPct.toFixed(2)}%</div>
+                        <td style={{padding:"10px 6px",textAlign:"center",fontSize:12,fontWeight:700,color:row.totalConvPct>=20?C.success:row.totalConvPct>=10?C.accent:row.totalConvPct>=5?C.warn:C.danger,borderBottom:`1px solid ${C.border}`,whiteSpace:"nowrap"}}>
+                          {row.totalConvPct.toFixed(2)}%
                         </td>
                         {row.stepData.map(function(step,si){
                           const prev=row.stepData[si-1];
-                          const col=STEP_COLORS[si%STEP_COLORS.length];
                           const convSoFar=step.val/s1*100;
                           const convFromPrev=si===0?100:step.val/(prev?prev.val:1)*100;
                           const dropped=prev?prev.val-step.val:null;
                           return <Fragment key={ri+"-"+si}>
-                            <td style={{padding:"9px 11px",textAlign:"center",borderLeft:`2px solid ${col}30`,borderBottom:`1px solid ${C.border}`,background:rowBg}}>
-                              <span style={{fontWeight:isBase?600:400,color:C.text}}>{step.val.toLocaleString()}</span>
+                            <td style={{padding:"10px",textAlign:"center",fontSize:12,color:C.text,borderBottom:`1px solid ${C.border}`,borderLeft:`2px solid ${STEP_COLORS[si%STEP_COLORS.length]}30`,whiteSpace:"nowrap"}}>
+                              {step.val.toLocaleString()}
                             </td>
-                            <td style={{padding:"9px 9px",textAlign:"center",borderBottom:`1px solid ${C.border}`,background:rowBg}}>
-                              <span style={{color:C.text3}}>{convSoFar.toFixed(2)}%</span>
+                            <td style={{padding:"10px",textAlign:"center",fontSize:12,color:C.text3,borderBottom:`1px solid ${C.border}`,whiteSpace:"nowrap"}}>
+                              {convSoFar.toFixed(1)}%
                             </td>
                             {si>0&&<Fragment>
-                              <td style={{padding:"9px 9px",textAlign:"center",borderBottom:`1px solid ${C.border}`,background:rowBg}}>
-                                <span style={{fontWeight:600,color:convColor(convFromPrev)}}>{convFromPrev.toFixed(2)}%</span>
+                              <td style={{padding:"10px",textAlign:"center",fontSize:12,color:convColor(convFromPrev),fontWeight:600,borderBottom:`1px solid ${C.border}`,whiteSpace:"nowrap"}}>
+                                {convFromPrev.toFixed(1)}%
                               </td>
-                              <td style={{padding:"9px 9px",textAlign:"center",borderBottom:`1px solid ${C.border}`,background:rowBg}}>
-                                {dropped===null?<span style={{color:C.muted}}>—</span>:<span style={{color:C.danger,fontWeight:isBase?600:400}}>{dropped.toLocaleString()}</span>}
+                              <td style={{padding:"10px",textAlign:"center",fontSize:12,color:C.danger,fontWeight:600,borderBottom:`1px solid ${C.border}`,whiteSpace:"nowrap"}}>
+                                {dropped===null?<span style={{color:C.muted}}>—</span>:dropped.toLocaleString()}
                               </td>
-                              <td style={{padding:"9px 9px",textAlign:"center",borderBottom:`1px solid ${C.border}`,background:rowBg}}>
-                                {step.avgTime===null?<span style={{color:C.muted}}>—</span>:<span style={{fontSize:11,padding:"2px 7px",borderRadius:3,background:C.warnBg,color:C.warn,fontWeight:600}}>⏱ {t.fmtTime(step.avgTime)}</span>}
+                              <td style={{padding:"10px",textAlign:"center",fontSize:12,borderBottom:`1px solid ${C.border}`,whiteSpace:"nowrap"}}>
+                                {step.avgTime===null?<span style={{color:C.muted}}>—</span>:<span style={{fontSize:11,padding:"2px 6px",borderRadius:3,background:C.warnBg,color:C.warn,fontWeight:600}}>⏱ {t.fmtTime(step.avgTime)}</span>}
                               </td>
                             </Fragment>}
                           </Fragment>;
@@ -2646,6 +2640,7 @@ function TrendsPage({lang,dateRange}){
   const [compareUnit,setCompareUnit]=useState("months");
   const [compareDropOpen,setCompareDropOpen]=useState(false);
   const [compareCustomStart,setCompareCustomStart]=useState("");
+  const [compareCustomExpanded,setCompareCustomExpanded]=useState(false);
   const compareRef=useRef();
 
   useEffect(()=>{
@@ -2931,22 +2926,29 @@ function TrendsPage({lang,dateRange}){
                     style={{padding:"4px 10px",borderRadius:5,border:"none",background:C.accent,color:"#fff",fontSize:11,fontWeight:600,cursor:"pointer",flexShrink:0,whiteSpace:"nowrap"}}>Apply</button>
                 </div>
                 <div style={{padding:"10px 14px",borderTop:`1px solid ${C.border}`,display:"flex",flexDirection:"column",gap:8}}>
-                  <div style={{fontSize:12,fontWeight:600,color:C.text}}>Custom Date Comparison</div>
-                  <div>
-                    <div style={{fontSize:9,fontWeight:600,color:C.muted,textTransform:"uppercase",marginBottom:3}}>Start Date</div>
-                    <input type="date" value={compareCustomStart} onChange={e=>setCompareCustomStart(e.target.value)}
-                      style={{width:"100%",padding:"6px 8px",borderRadius:4,border:`1px solid ${C.border2}`,fontSize:11,color:C.text,outline:"none",boxSizing:"border-box"}}/>
+                  <div onClick={()=>setCompareCustomExpanded(!compareCustomExpanded)} style={{fontSize:12,color:C.text,cursor:"pointer",display:"flex",alignItems:"center",gap:6}}>
+                    <span style={{display:"inline-block",transform:compareCustomExpanded?"rotate(180deg)":"none",transition:"transform 0.15s"}}>▼</span>
+                    Custom Date Comparison
                   </div>
-                  {compareCustomStart&&(
-                    <div style={{fontSize:10,color:C.muted}}>
-                      Compares to: {new Date(compareCustomStart).toLocaleDateString()} - {new Date(new Date(compareCustomStart).getTime() + periodDays*24*60*60*1000).toLocaleDateString()}
-                    </div>
+                  {compareCustomExpanded&&(
+                    <>
+                      <div>
+                        <div style={{fontSize:9,fontWeight:600,color:C.muted,textTransform:"uppercase",marginBottom:3}}>Start Date</div>
+                        <input type="date" value={compareCustomStart} onChange={e=>setCompareCustomStart(e.target.value)}
+                          style={{width:"100%",padding:"6px 8px",borderRadius:4,border:`1px solid ${C.border2}`,fontSize:11,color:C.text,outline:"none",boxSizing:"border-box"}}/>
+                      </div>
+                      {compareCustomStart&&(
+                        <div style={{fontSize:10,color:C.muted}}>
+                          Compares to: {new Date(compareCustomStart).toLocaleDateString()} - {new Date(new Date(compareCustomStart).getTime() + periodDays*24*60*60*1000).toLocaleDateString()}
+                        </div>
+                      )}
+                      <button onClick={()=>{setCompareMode("custom");setCompareDropOpen(false);}}
+                        disabled={!compareCustomStart}
+                        style={{width:"100%",padding:"6px",borderRadius:5,border:"none",background:C.accent,color:"#fff",fontSize:11,fontWeight:600,cursor:!compareCustomStart?"not-allowed":"pointer",opacity:!compareCustomStart?0.4:1}}>
+                        Apply Custom Comparison
+                      </button>
+                    </>
                   )}
-                  <button onClick={()=>{setCompareMode("custom");setCompareDropOpen(false);}}
-                    disabled={!compareCustomStart}
-                    style={{width:"100%",padding:"6px",borderRadius:5,border:"none",background:C.accent,color:"#fff",fontSize:11,fontWeight:600,cursor:!compareCustomStart?"not-allowed":"pointer",opacity:!compareCustomStart?0.4:1}}>
-                    Apply Custom Comparison
-                  </button>
                 </div>
               </div>
             )}
