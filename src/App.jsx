@@ -1977,7 +1977,7 @@ function FunnelPage({panelOpen,setPanel,setTab,descriptions,setDescriptions,setF
                 return (
                   <div style={{overflowX:"auto",marginLeft:-18,marginRight:-18,paddingLeft:18}}>
                     <div style={{width:chartW}}>
-                      <BarChart width={chartW} height={260} data={chartData} barCategoryGap="20%" barGap={1} margin={{top:4,right:18,bottom:4,left:0}}>
+                      <BarChart width={chartW} height={260} data={chartData} barCategoryGap="20%" barGap={1} margin={{top:4,right:-40,bottom:4,left:20}}>
                         <XAxis dataKey="name" tick={false} axisLine={false} tickLine={false} height={0}/>
                         <YAxis tick={{fontSize:10,fill:C.muted}} axisLine={false} tickLine={false} width={YAXIS_W} tickFormatter={function(v){return v+"%";}} domain={[0,100]}/>
                         <Tooltip content={ChartTooltip} cursor={{fill:"#f3f4f6"}}/>
@@ -1992,7 +1992,7 @@ function FunnelPage({panelOpen,setPanel,setTab,descriptions,setDescriptions,setF
                           const dropped=prev?prev.val-step.val:null;
                           return (
                             <div key={i} style={{width:STEP_W,flexShrink:0,padding:"10px 8px 14px",borderRight:i===result.length-1?"none":`1px solid ${C.border}`}}>
-                              <div style={{display:"flex",alignItems:"center",gap:5,marginBottom:6}}>
+                              <div style={{display:"flex",alignItems:"left",gap:5,marginBottom:6,justifyContent:"left"}}>
                                 <div style={{width:16,height:16,borderRadius:4,background:tagColor,color:"#fff",fontSize:9,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{i+1}</div>
                                 <div style={{fontSize:11,fontWeight:700,color:C.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{lang==="zh"?step.labelZh:step.label}</div>
                               </div>
@@ -2002,7 +2002,7 @@ function FunnelPage({panelOpen,setPanel,setTab,descriptions,setDescriptions,setF
                                   :result[0].val;
                                 const pct=i===0?null:((step.val/base)*100).toFixed(1);
                                 return(
-                                  <div style={{display:"flex",alignItems:"center",gap:4,marginBottom:4}}>
+                                  <div style={{display:"flex",alignItems:"center",gap:4,marginBottom:4,justifyContent:"left"}}>
                                     <span style={{color:C.success,fontSize:13}}>→</span>
                                     <span style={{fontSize:12,fontWeight:700,color:C.text}}>{step.val.toLocaleString()}</span>
                                     <span style={{fontSize:10,color:C.muted}}>{i===0?(aggregateBy==="sessions"?"sessions":"users"):`(${pct}%)`}</span>
@@ -2010,14 +2010,14 @@ function FunnelPage({panelOpen,setPanel,setTab,descriptions,setDescriptions,setF
                                 );
                               })()}
                               {dropped!==null&&(
-                                <div style={{display:"flex",alignItems:"center",gap:4}}>
+                                <div style={{display:"flex",alignItems:"center",gap:4,justifyContent:"left"}}>
                                   <span style={{color:C.danger,fontSize:12}}>↘</span>
                                   <span style={{fontSize:12,fontWeight:700,color:C.text}}>{dropped.toLocaleString()}</span>
                                   <span style={{fontSize:10,color:C.muted}}>({""+((dropped/(prev?prev.val:1))*100).toFixed(1)+"%"})</span>
                                 </div>
                               )}
                               {i>0&&step.avgTime!=null&&(
-                                <div style={{display:"flex",alignItems:"center",gap:4,marginTop:4}}>
+                                <div style={{display:"flex",alignItems:"center",gap:4,marginTop:4,justifyContent:"left"}}>
                                   <span style={{fontSize:11,padding:"2px 6px",borderRadius:3,background:C.warnBg,color:C.warn,fontWeight:600}}>⏱ {t.fmtTime(step.avgTime)}</span>
                                 </div>
                               )}
