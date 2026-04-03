@@ -218,6 +218,8 @@ const useT = () => {
     keyFindingsHeader:l==="zh"?"关键发现":"Key Findings",
     moreLikely:(x)=>l==="zh"?`执行该事件的用户完成漏斗的可能性高 ${x} 倍`:`Users who performed this event were ${x}x more likely to complete the funnel`,
     successLabel:l==="zh"?"成功":"Success",
+    completedStep:(n)=>l==="zh"?`已完成第${n}步`:`Completed ${n} step`,
+    completedSteps:(n)=>l==="zh"?`已完成${n}个步骤`:`Completed ${n} steps`,
     dropoffLabel:l==="zh"?"流失":"Drop-off",
     liftLabel:l==="zh"?"提升倍数":"Lift",
     opportunityLabel:l==="zh"?"机会分":"Opportunity",
@@ -1624,9 +1626,17 @@ function FunnelPage({panelOpen,setPanel,setTab,descriptions,setDescriptions,setF
   const SESSION_MULT=1.45;
   const ORDER_MULT={sequential:1.0,strict:0.84,any:1.13};
 
+  const getStepLabel=function(ev,i,useGeneric){
+    if(useGeneric){
+      return lang==="zh"?`已完成第${i+1}步`:`Completed ${i+1} step`;
+    }
+    return lang==="zh"?ev.labelZh:ev.label;
+  };
+
   const breakdownData=useMemo(function(){
     if(!ran||steps.length<2)return [];
     const oMult=ORDER_MULT[stepOrder]||1.0;
+    const useGenericNames=stepOrder==="any";
     return coloredBreakItems.map(function(item){
       const curve=SEG_CURVES[item.key]||SEG_CURVES.all;
       const baseMult=aggregateBy==="sessions"?SESSION_MULT:1;
@@ -1640,13 +1650,14 @@ function FunnelPage({panelOpen,setPanel,setTab,descriptions,setDescriptions,setF
           val=Math.round(Math.min(curveVal*Math.pow(oMult,i),acc[i-1].val));
         }
         const ev=ALL_EVENTS.find(function(e){return e.id===id;});
-        acc.push({id,label:ev?ev.label:id,labelZh:ev?ev.labelZh:id,val,avgTime:AVG_TIME[id]!=null?AVG_TIME[id]:null});
+        const displayLabel=getStepLabel(ev,i,useGenericNames);
+        acc.push({id,label:ev?ev.label:id,labelZh:ev?ev.labelZh:id,displayLabel,val,avgTime:AVG_TIME[id]!=null?AVG_TIME[id]:null});
         return acc;
       },[]);
       const s1=sd[0]?sd[0].val:1;
       return {...item,stepData:sd,totalConvPct:sd[sd.length-1].val/s1*100};
     });
-  },[ran,steps,coloredBreakItems,segmentMult,aggregateBy,stepOrder,periodDays]);
+  },[ran,steps,coloredBreakItems,segmentMult,aggregateBy,stepOrder,periodDays,lang]);
 
   const result=breakdownData[0]?breakdownData[0].stepData:[];
 
@@ -1654,7 +1665,7 @@ function FunnelPage({panelOpen,setPanel,setTab,descriptions,setDescriptions,setF
     if(!breakdownData.length||!result.length)return [];
     const rows=breakBy==="none"?breakdownData:breakdownData.filter(function(r){return r.key!=="all";});
     return result.map(function(s,i){
-      const name=lang==="zh"?s.labelZh:s.label;
+      const name=s.displayLabel||(lang==="zh"?s.labelZh:s.label);
       const obj={name:name.length>12?name.slice(0,11)+"…":name,fullName:name};
       rows.forEach(function(row){
         const s1=row.stepData[0]?row.stepData[0].val:1;
@@ -1994,7 +2005,7 @@ function FunnelPage({panelOpen,setPanel,setTab,descriptions,setDescriptions,setF
                             <div key={i} style={{width:STEP_W,flexShrink:0,padding:"10px 8px 14px",borderRight:i===result.length-1?"none":`1px solid ${C.border}`}}>
                               <div style={{display:"flex",alignItems:"left",gap:5,marginBottom:6,justifyContent:"left"}}>
                                 <div style={{width:16,height:16,borderRadius:4,background:tagColor,color:"#fff",fontSize:9,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{i+1}</div>
-                                <div style={{fontSize:11,fontWeight:700,color:C.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{lang==="zh"?step.labelZh:step.label}</div>
+                                <div style={{fontSize:11,fontWeight:700,color:C.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{step.displayLabel||(lang==="zh"?step.labelZh:step.label)}</div>
                               </div>
                               {(()=>{
                                 const base=convCalc==="relative"
@@ -2051,7 +2062,7 @@ function FunnelPage({panelOpen,setPanel,setTab,descriptions,setDescriptions,setF
                       <th rowSpan={2} style={{padding:"10px 6px",textAlign:"center",fontSize:11,fontWeight:600,color:C.muted,borderBottom:`2px solid ${C.border}`,whiteSpace:"nowrap",verticalAlign:"middle"}}>Total Conv%</th>
                       {result.map(function(s,si){
                         const col=STEP_COLORS[si%STEP_COLORS.length];
-                        const stepName=lang==="zh"?s.labelZh:s.label;
+                        const stepName=s.displayLabel||(lang==="zh"?s.labelZh:s.label);
                         return <th key={si} colSpan={si===0?2:5} style={{padding:"10px 8px",textAlign:"center",fontSize:11,fontWeight:700,color:col,borderBottom:`1px solid ${C.border}`,borderLeft:`2px solid ${col}30`,whiteSpace:"nowrap"}}>
                           <span style={{display:"inline-block",width:"22px",height:"22px",lineHeight:"22px",textAlign:"center",fontWeight:"800",marginRight:"4px",background:col,color:"#fff",borderRadius:"3px"}}>{si+1}</span>{stepName}
                         </th>;
