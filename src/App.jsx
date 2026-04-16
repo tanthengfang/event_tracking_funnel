@@ -1588,6 +1588,11 @@ function FunnelPage({panelOpen,setPanel,setTab,descriptions,setDescriptions,setF
   const addStepCloseTimer=useRef(null);
   const addStepTipEditing=useRef(false);
 
+  const [breakdownOpen,setBreakdownOpen]=useState(false);
+  const [breakdownSearch,setBreakdownSearch]=useState("");
+  const [breakdownFilter,setBreakdownFilter]=useState("all");
+  const breakdownRef=useRef(null);
+
   const openAddStepTip=function(ev,rect){
     if(addStepCloseTimer.current)clearTimeout(addStepCloseTimer.current);
     const pw=260;const spaceRight=window.innerWidth-(rect.right+12);
@@ -1616,6 +1621,13 @@ function FunnelPage({panelOpen,setPanel,setTab,descriptions,setDescriptions,setF
     })();
   },[]);
 
+  useEffect(()=>{
+    if(!breakdownOpen)return;
+    const h=e=>{if(breakdownRef.current&&!breakdownRef.current.contains(e.target))setBreakdownOpen(false);};
+    document.addEventListener("mousedown",h);
+    return()=>document.removeEventListener("mousedown",h);
+  },[breakdownOpen]);
+
   const coloredBreakItems=useMemo(function(){return [BASELINE,...(BREAK_DEFS[breakBy]||[])].map(function(item,i){return {...item,color:C.seg[i]||C.muted};});},[breakBy]);
   const segmentMult=useMemo(function(){
     if(!activeFilter)return 1;
@@ -1629,6 +1641,15 @@ function FunnelPage({panelOpen,setPanel,setTab,descriptions,setDescriptions,setF
   const FEATURE_FLAG_SEGMENTS={
     checkout_flow_test:"vip_users",
   };
+
+  const breakdownOptions=[
+    {value:"none",label:t.noBreakdown,category:"all"},
+    {value:"device",label:t.byDevice,category:"person"},
+    {value:"status",label:t.byStatus,category:"person"},
+    {value:"v2_search_algo",label:t.byV2SearchAlgo,category:"feature"},
+    {value:"checkout_flow_test",label:t.byCheckoutFlowTest,category:"feature"},
+    {value:"cny_festival_ui",label:t.byCnyFestivalUi,category:"feature"},
+  ];
 
   const handleBreakByChange=function(v){
     setBreakBy(v);
@@ -1675,6 +1696,12 @@ function FunnelPage({panelOpen,setPanel,setTab,descriptions,setDescriptions,setF
   },[ran,steps,coloredBreakItems,segmentMult,aggregateBy,stepOrder,periodDays,lang]);
 
   const result=breakdownData[0]?breakdownData[0].stepData:[];
+
+  const filteredBreakdown=breakdownOptions.filter(opt=>
+    (breakdownFilter==="all"||opt.category===breakdownFilter)&&
+    opt.label.toLowerCase().includes(breakdownSearch.toLowerCase())
+  );
+  const currentBreakdownLabel=breakdownOptions.find(opt=>opt.value===breakBy)?.label||t.noBreakdown;
 
   const chartData=useMemo(function(){
     if(!breakdownData.length||!result.length)return [];
@@ -1880,7 +1907,44 @@ function FunnelPage({panelOpen,setPanel,setTab,descriptions,setDescriptions,setF
               </div>
               <div>
                 <FieldLabel>{t.breakDownBy}</FieldLabel>
-                <CustomSelect value={breakBy} onChange={handleBreakByChange} options={[{value:"none",label:t.noBreakdown},{value:"device",label:t.byDevice},{value:"status",label:t.byStatus},{value:"region",label:t.byRegion},{value:"v2_search_algo",label:t.byV2SearchAlgo},{value:"checkout_flow_test",label:t.byCheckoutFlowTest},{value:"cny_festival_ui",label:t.byCnyFestivalUi}]}/>
+                <div ref={breakdownRef} style={{position:"relative"}}>
+                  <button onClick={()=>setBreakdownOpen(v=>!v)}
+                    style={{width:"100%",padding:"14px 9px",fontWeight:"bold",borderRadius:5,border:`1px solid ${breakdownOpen?C.accent:C.border2}`,background:breakdownOpen?C.accentBg:C.card,color:breakdownOpen?C.accent:C.text,fontSize:11,cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                    {currentBreakdownLabel}
+                    <span style={{fontSize:9,transform:breakdownOpen?"rotate(180deg)":"none",transition:"transform 0.15s"}}>▼</span>
+                  </button>
+                  {breakdownOpen&&(
+                    <div style={{position:"absolute",top:"calc(100% + 6px)",left:0,right:0,zIndex:400,background:C.card,border:`1px solid ${C.border2}`,borderRadius:8,boxShadow:"0 6px 24px rgba(0,0,0,0.13)",overflow:"hidden"}}>
+                      <div style={{padding:"8px 10px",borderBottom:`1px solid ${C.border}`,display:"flex",gap:6,flexDirection:"column"}}>
+                        <input autoFocus value={breakdownSearch} onChange={e=>setBreakdownSearch(e.target.value)} placeholder="Search breakdowns…"
+                          style={{width:"100%",padding:"6px 9px",borderRadius:5,border:`1px solid ${C.border2}`,fontSize:11,color:C.text,outline:"none",boxSizing:"border-box"}}/>
+                        <div style={{display:"flex",gap:3}}>
+                          {[{key:"all",label:"All",color:C.muted},{key:"person",label:"Person Property",color:C.accent},{key:"feature",label:"Feature Flag",color:C.warn}].map(opt=>(
+                            <button key={opt.key} onClick={()=>setBreakdownFilter(opt.key)}
+                              style={{padding:"2px 9px",borderRadius:4,border:`1px solid ${breakdownFilter===opt.key?opt.color:C.border}`,background:breakdownFilter===opt.key?opt.color+"18":"transparent",color:breakdownFilter===opt.key?opt.color:C.muted,fontSize:10,fontWeight:breakdownFilter===opt.key?700:400,cursor:"pointer"}}>
+                              {opt.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div style={{maxHeight:200,overflowY:"auto",padding:"4px 6px",display:"flex",flexDirection:"column",gap:1}}>
+                        {filteredBreakdown.length===0&&<div style={{fontSize:11,color:C.muted,textAlign:"center",padding:"10px 0"}}>No results</div>}
+                        {filteredBreakdown.map(opt=>(
+                          <div key={opt.value}
+                            onClick={()=>{handleBreakByChange(opt.value);setBreakdownOpen(false);setBreakdownSearch("");}}
+                            style={{padding:"7px 8px",borderRadius:5,cursor:"pointer",background:"transparent"}}
+                            onMouseEnter={e=>e.currentTarget.style.background=C.accentBg}
+                            onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                            <div style={{fontSize:12,color:C.text2}}>{opt.label}</div>
+                            <div style={{display:"flex",alignItems:"center",gap:5,marginTop:1}}>
+                              <span style={{fontSize:9,color:opt.category==="person"?C.accent:opt.category==="feature"?C.warn:C.muted,fontWeight:600}}>{opt.category==="person"?"Person Property":opt.category==="feature"?"Feature Flag":"All"}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
                 <div style={{marginTop:8,padding:"8px 10px",borderRadius:6,background:C.bg,border:`1px solid ${C.border}`}}>
                   {coloredBreakItems.map(function(item){return(
                     <div key={item.key} style={{display:"flex",alignItems:"center",gap:7,marginBottom:4}}>
@@ -2679,12 +2743,24 @@ function TrendsPage({lang,dateRange}){
   const [compareCustomExpanded,setCompareCustomExpanded]=useState(false);
   const compareRef=useRef();
 
+  const [breakdownOpen,setBreakdownOpen]=useState(false);
+  const [breakdownSearch,setBreakdownSearch]=useState("");
+  const [breakdownFilter,setBreakdownFilter]=useState("all");
+  const breakdownRef=useRef(null);
+
   useEffect(()=>{
     if(!compareDropOpen)return;
     const h=e=>{if(compareRef.current&&!compareRef.current.contains(e.target))setCompareDropOpen(false);};
     document.addEventListener("mousedown",h);
     return()=>document.removeEventListener("mousedown",h);
   },[compareDropOpen]);
+
+  useEffect(()=>{
+    if(!breakdownOpen)return;
+    const h=e=>{if(breakdownRef.current&&!breakdownRef.current.contains(e.target))setBreakdownOpen(false);};
+    document.addEventListener("mousedown",h);
+    return()=>document.removeEventListener("mousedown",h);
+  },[breakdownOpen]);
 
   const comparePrev=compareMode!=="none";
   const compareLabel=compareMode==="none"?"No comparison between periods":compareMode==="prev"?"Compare to previous period":compareMode==="custom"&&compareCustomStart?`Compare to ${new Date(compareCustomStart).toLocaleDateString()} - ${new Date(new Date(compareCustomStart).getTime() + periodDays*24*60*60*1000).toLocaleDateString()}`:`Compare to ${compareVal} ${compareUnit} earlier`;
@@ -2694,6 +2770,15 @@ function TrendsPage({lang,dateRange}){
   const FEATURE_FLAG_SEGMENTS={
     checkout_flow_test:"vip_users",
   };
+
+  const breakdownOptions=[
+    {value:"none",label:"No breakdown",category:"all"},
+    {value:"device",label:"By Device",category:"person"},
+    {value:"status",label:"By User Role",category:"person"},
+    {value:"v2_search_algo",label:"By v2-search-algo",category:"feature"},
+    {value:"checkout_flow_test",label:"By checkout-flow-test",category:"feature"},
+    {value:"cny_festival_ui",label:"By cny-festival-ui",category:"feature"},
+  ];
 
   const handleBreakByChange=function(v){
     setBreakBy(v);
@@ -2711,6 +2796,12 @@ function TrendsPage({lang,dateRange}){
     return seg?seg.mult:1;
   },[activeFilter]);
   const toggleFilter=function(key){setActiveFilter(function(prev){return prev===key?null:key;});};
+
+  const filteredBreakdown=breakdownOptions.filter(opt=>
+    (breakdownFilter==="all"||opt.category===breakdownFilter)&&
+    opt.label.toLowerCase().includes(breakdownSearch.toLowerCase())
+  );
+  const currentBreakdownLabel=breakdownOptions.find(opt=>opt.value===breakBy)?.label||"No breakdown";
 
   useEffect(()=>{
     if(!addOpen)return;
@@ -2926,14 +3017,47 @@ function TrendsPage({lang,dateRange}){
                 </div>
             </div>
           </div>
-          <div style={{minWidth:180,display:"flex",flexDirection:"column",gap:12}}>
+          <div style={{minWidth:260,display:"flex",flexDirection:"column",gap:12}}>
             <div>
               <div style={{fontSize:10,fontWeight:700,color:C.muted,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:8}}>Breakdown by</div>
-              <CustomSelect value={breakBy} onChange={handleBreakByChange} options={[
-                {value:"none",label:"No breakdown"},{value:"device",label:"By Device"},
-                {value:"status",label:"By User Role"},{value:"region",label:"By Region"},
-                {value:"v2_search_algo",label:"By v2-search-algo"},{value:"checkout_flow_test",label:"By checkout-flow-test"},{value:"cny_festival_ui",label:"By cny-festival-ui"},
-              ]}/>
+              <div ref={breakdownRef} style={{position:"relative"}}>
+                <button onClick={()=>setBreakdownOpen(v=>!v)}
+                  style={{width:"100%",padding:"14px 9px",borderRadius:5,border:`1px solid ${breakdownOpen?C.accent:C.border2}`,background:breakdownOpen?C.accentBg:C.card,color:breakdownOpen?C.accent:C.text,fontSize:11,cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                  {currentBreakdownLabel}
+                  <span style={{fontSize:9,transform:breakdownOpen?"rotate(180deg)":"none",transition:"transform 0.15s"}}>▼</span>
+                </button>
+                {breakdownOpen&&(
+                  <div style={{position:"absolute",top:"calc(100% + 6px)",left:0,right:0,zIndex:400,background:C.card,border:`1px solid ${C.border2}`,borderRadius:8,boxShadow:"0 6px 24px rgba(0,0,0,0.13)",overflow:"hidden"}}>
+                    <div style={{padding:"8px 10px",borderBottom:`1px solid ${C.border}`,display:"flex",gap:6,flexDirection:"column"}}>
+                      <input autoFocus value={breakdownSearch} onChange={e=>setBreakdownSearch(e.target.value)} placeholder="Search breakdowns…"
+                        style={{width:"100%",padding:"6px 9px",borderRadius:5,border:`1px solid ${C.border2}`,fontSize:11,color:C.text,outline:"none",boxSizing:"border-box"}}/>
+                      <div style={{display:"flex",gap:3}}>
+                        {[{key:"all",label:"All",color:C.muted},{key:"person",label:"Person Property",color:C.accent},{key:"feature",label:"Feature Flag",color:C.warn}].map(opt=>(
+                          <button key={opt.key} onClick={()=>setBreakdownFilter(opt.key)}
+                            style={{padding:"2px 9px",borderRadius:4,border:`1px solid ${breakdownFilter===opt.key?opt.color:C.border}`,background:breakdownFilter===opt.key?opt.color+"18":"transparent",color:breakdownFilter===opt.key?opt.color:C.muted,fontSize:10,fontWeight:breakdownFilter===opt.key?700:400,cursor:"pointer"}}>
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div style={{maxHeight:200,overflowY:"auto",padding:"4px 6px",display:"flex",flexDirection:"column",gap:1}}>
+                      {filteredBreakdown.length===0&&<div style={{fontSize:11,color:C.muted,textAlign:"center",padding:"10px 0"}}>No results</div>}
+                      {filteredBreakdown.map(opt=>(
+                        <div key={opt.value}
+                          onClick={()=>{handleBreakByChange(opt.value);setBreakdownOpen(false);setBreakdownSearch("");}}
+                          style={{padding:"7px 8px",borderRadius:5,cursor:"pointer",background:"transparent"}}
+                          onMouseEnter={e=>e.currentTarget.style.background=C.accentBg}
+                          onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                          <div style={{fontSize:12,color:C.text2}}>{opt.label}</div>
+                          <div style={{display:"flex",alignItems:"center",gap:5,marginTop:1}}>
+                            <span style={{fontSize:9,color:opt.category==="person"?C.accent:opt.category==="feature"?C.warn:C.muted,fontWeight:600}}>{opt.category==="person"?"Person Property":opt.category==="feature"?"Feature Flag":"All"}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
             <div>
               <FieldLabel>Filter</FieldLabel>
