@@ -3144,14 +3144,6 @@ function TrendsPage({lang,dateRange}){
               </div>
             )}
           </div>
-          <div style={{marginLeft:"auto",display:"flex",background:C.bg,borderRadius:6,padding:2,gap:1,border:`1px solid ${C.border}`}}>
-            {[{id:"line",icon:"📈",label:"Line chart"},{id:"bar",icon:"📊",label:"Bar chart"}].map(ct=>(
-              <button key={ct.id} onClick={()=>setChartType(ct.id)}
-                style={{padding:"4px 12px",borderRadius:5,border:"none",cursor:"pointer",fontSize:11,fontWeight:chartType===ct.id?600:400,background:chartType===ct.id?C.card:"transparent",color:chartType===ct.id?C.text:C.muted,boxShadow:chartType===ct.id?"0 1px 3px rgba(0,0,0,0.08)":"none",display:"flex",alignItems:"center",gap:4}}>
-                {ct.icon} {ct.label}
-              </button>
-            ))}
-          </div>
         </div>
 
         <div style={{display:"flex",flexWrap:"wrap",gap:12,marginBottom:10,paddingLeft:PL}}>
@@ -3203,65 +3195,6 @@ function TrendsPage({lang,dateRange}){
               })}
 
             </svg>
-          )}
-          {chartType==="bar"&&(
-            <BarChart width={chartW} height={H} data={labels.map(function(l,i){
-              const obj={label:l.label,fullLabel:l.fullLabel,dataIdx:i};
-              seriesData.forEach(s=>{obj[s.id]=s.points[i];obj[s.id+"_prev"]=s.prev[i];});
-              return obj;
-            })} barCategoryGap="20%" margin={{top:PT,right:PR,bottom:0,left:PL-10}}>
-              <XAxis dataKey="label" tick={{fontSize:10,fill:C.muted}} axisLine={false} tickLine={false}/>
-              <YAxis tick={{fontSize:10,fill:C.muted}} axisLine={false} tickLine={false} tickFormatter={v=>v>=1000?(v/1000).toFixed(1)+"k":v}/>
-              <Tooltip content={({active,payload})=>{
-                if(!active||!payload||!payload[0])return null;
-                const dataIdx=payload[0].payload.dataIdx;
-                return(
-                  <div style={{background:C.card,borderRadius:8,boxShadow:"0 6px 24px rgba(0,0,0,0.14)",border:`1px solid ${C.border}`,padding:"10px",maxWidth:450,maxHeight:300,overflowY:"auto"}}>
-                    <div style={{fontSize:11,fontWeight:700,color:C.text,paddingBottom:8,borderBottom:`1px solid ${C.border}`,marginBottom:10}}>{labels[dataIdx]&&labels[dataIdx].fullLabel}</div>
-                    {comparePrev?(
-                      <div style={{overflowX:"auto"}}>
-                        <table style={{borderCollapse:"collapse",fontSize:11,minWidth:"100%"}}>
-                          <thead>
-                            <tr style={{borderBottom:`1px solid ${C.border}`}}>
-                              <th style={{padding:"6px 8px",textAlign:"left",fontWeight:600,color:C.muted,whiteSpace:"nowrap"}}>Type</th>
-                              {seriesData.map(s=>(
-                                <th key={s.id} style={{padding:"6px 8px",textAlign:"right",fontWeight:600,color:C.text3,whiteSpace:"nowrap"}}>{evLabel(s.eventId)}</th>
-                              ))}
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td style={{padding:"6px 8px",fontWeight:600,color:C.text,whiteSpace:"nowrap"}}>Current</td>
-                              {seriesData.map(s=>(
-                                <td key={s.id} style={{padding:"6px 8px",textAlign:"right",color:C.text,fontWeight:600,color:s.color}}>{s.points[dataIdx]!=null?s.points[dataIdx].toLocaleString():"—"}</td>
-                              ))}
-                            </tr>
-                            <tr>
-                              <td style={{padding:"6px 8px",fontWeight:600,color:C.muted,whiteSpace:"nowrap"}}>Previous</td>
-                              {seriesData.map(s=>(
-                                <td key={s.id} style={{padding:"6px 8px",textAlign:"right",color:C.muted,fontWeight:600}}>{s.prev[dataIdx]!=null?s.prev[dataIdx].toLocaleString():"—"}</td>
-                              ))}
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    ):(
-                      <div>
-                        {seriesData.map(s=>(
-                          <div key={s.id} style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
-                            <div style={{width:8,height:8,borderRadius:2,background:s.color,flexShrink:0}}/>
-                            <span style={{fontSize:11,color:C.text3,flex:1}}>{evLabel(s.eventId)}</span>
-                            <span style={{fontSize:12,fontWeight:700,color:s.color}}>{s.points[dataIdx]!=null?s.points[dataIdx].toLocaleString():"—"}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              }}/>
-              {seriesData.map(s=><Bar key={s.id} dataKey={s.id} name={evLabel(s.eventId)+" Current"} fill={s.color} radius={[2,2,0,0]} maxBarSize={28}/>)}
-              {comparePrev&&seriesData.map(s=><Bar key={s.id+"_prev"} dataKey={s.id+"_prev"} name={evLabel(s.eventId)+" Prev"} fill={s.color} opacity={0.35} radius={[2,2,0,0]} maxBarSize={28}/>)}
-            </BarChart>
           )}
           {(tooltip||pinnedTooltip)&&chartType==="line"&&(
             <div style={{position:"absolute",top:Math.max(0,(pinnedTooltip||tooltip).relY-10),left:(pinnedTooltip||tooltip).relX+16+280>chartW?(pinnedTooltip||tooltip).relX-290:(pinnedTooltip||tooltip).relX+12,zIndex:999,pointerEvents:pinnedTooltip?"auto":"none",background:C.card,borderRadius:8,boxShadow:"0 6px 24px rgba(0,0,0,0.14)",border:`1px solid ${C.border}`,padding:"10px",maxWidth:450,maxHeight:pinnedTooltip?300:"none",overflowY:pinnedTooltip?"auto":"visible"}}>
