@@ -168,6 +168,9 @@ const useT = () => {
     byDevice:l==="zh"?"按设备":"By Device",
     byStatus:l==="zh"?"BASE/免费/VIP/SVIP":"BASE/Free/VIP/SVIP",
     byRegion:l==="zh"?"按地区":"By Region",
+    byV2SearchAlgo:l==="zh"?"按 v2-search-algo":"By v2-search-algo",
+    byCheckoutFlowTest:l==="zh"?"按 checkout-flow-test":"By checkout-flow-test",
+    byCnyFestivalUi:l==="zh"?"按 cny-festival-ui":"By cny-festival-ui",
     presetFunnels:l==="zh"?"预设漏斗":"Preset Funnels",
     loading:l==="zh"?"加载中…":"Loading…",
     saveCurrentAsPreset:l==="zh"?"+ 保存为预设":"+ Save as Preset",
@@ -191,7 +194,7 @@ const useT = () => {
     deletePresetTitle:l==="zh"?"删除预设？":"Delete preset?",
     deleteBtn:l==="zh"?"删除":"Delete",
     searchSteps:l==="zh"?"搜索步骤…":"Search steps…",
-    breakdownLabel:{device:l==="zh"?"设备":"Device",status:l==="zh"?"状态":"Status",region:l==="zh"?"地区":"Region"},
+    breakdownLabel:{device:l==="zh"?"设备":"Device",status:l==="zh"?"状态":"Status",region:l==="zh"?"地区":"Region",v2_search_algo:l==="zh"?"v2-search-algo":"v2-search-algo",checkout_flow_test:l==="zh"?"checkout-flow-test":"checkout-flow-test",cny_festival_ui:l==="zh"?"cny-festival-ui":"cny-festival-ui"},
     stepsCount:(n)=>l==="zh"?`${n} 个步骤 · 拖动排序`:`${n} steps · drag to reorder`,
     stepsCollapsed:(n)=>l==="zh"?`${n} 个步骤（已折叠）`:`${n} steps (collapsed)`,
     deleteConfirmText:(n)=>l==="zh"?`"${n}" 将被永久删除`:`"${n}" will be permanently removed.`,
@@ -390,6 +393,9 @@ const BREAK_DEFS={
   device:[{key:"windows",label:"Windows",labelZh:"Windows",mult:0.38},{key:"ios",label:"iOS",labelZh:"iOS",mult:0.28},{key:"android",label:"Android",labelZh:"Android",mult:0.22},{key:"macos",label:"macOS",labelZh:"macOS",mult:0.08},{key:"linux",label:"Linux",labelZh:"Linux",mult:0.04}],
   status:[{key:"base",label:"BASE",labelZh:"BASE",mult:0.12},{key:"free",label:"Free",labelZh:"免费",mult:0.60},{key:"vip",label:"VIP",labelZh:"VIP",mult:0.18},{key:"svip",label:"SVIP",labelZh:"SVIP",mult:0.10}],
   region:[{key:"north",label:"North China",labelZh:"华北",mult:0.28},{key:"east",label:"East China",labelZh:"华东",mult:0.32},{key:"south",label:"South China",labelZh:"华南",mult:0.22},{key:"central",label:"Central China",labelZh:"华中",mult:0.10},{key:"west",label:"West China",labelZh:"西部",mult:0.08}],
+  v2_search_algo:[{key:"v2_search_algo_true",label:"v2-search-algo: true",labelZh:"v2-search-algo：开启",mult:0.52},{key:"v2_search_algo_false",label:"v2-search-algo: false",labelZh:"v2-search-algo：关闭",mult:0.48}],
+  checkout_flow_test:[{key:"checkout_flow_test_control",label:"checkout-flow-test: control",labelZh:"checkout-flow-test：control",mult:0.35},{key:"checkout_flow_test_one_page",label:"checkout-flow-test: one_page",labelZh:"checkout-flow-test：one_page",mult:0.40},{key:"checkout_flow_test_step_wizard",label:"checkout-flow-test: step_wizard",labelZh:"checkout-flow-test：step_wizard",mult:0.25}],
+  cny_festival_ui:[{key:"cny_festival_ui_true",label:"cny-festival-ui: true",labelZh:"cny-festival-ui：开启",mult:0.60},{key:"cny_festival_ui_false",label:"cny-festival-ui: false",labelZh:"cny-festival-ui：关闭",mult:0.40}],
 };
 const BASELINE={key:"all",label:"Baseline",labelZh:"基准线",mult:1};
 const SEG_CURVES={
@@ -408,6 +414,13 @@ const SEG_CURVES={
   south:[1.00,0.86,0.71,0.58,0.48,0.40,0.34,0.29,0.25,0.21],
   central:[1.00,0.83,0.66,0.52,0.41,0.33,0.27,0.22,0.18,0.15],
   west:[1.00,0.80,0.62,0.48,0.37,0.29,0.23,0.18,0.15,0.12],
+  v2_search_algo_true:[1.00,0.86,0.68,0.53,0.41,0.32,0.25,0.20,0.16,0.13],
+  v2_search_algo_false:[1.00,0.82,0.60,0.43,0.31,0.22,0.16,0.11,0.08,0.05],
+  checkout_flow_test_control:[1.00,0.81,0.59,0.40,0.27,0.18,0.12,0.08,0.05,0.03],
+  checkout_flow_test_one_page:[1.00,0.88,0.74,0.64,0.55,0.47,0.40,0.34,0.29,0.24],
+  checkout_flow_test_step_wizard:[1.00,0.84,0.66,0.51,0.39,0.30,0.23,0.18,0.14,0.11],
+  cny_festival_ui_true:[1.00,0.92,0.79,0.68,0.59,0.51,0.44,0.38,0.33,0.29],
+  cny_festival_ui_false:[1.00,0.81,0.59,0.42,0.29,0.19,0.12,0.08,0.05,0.03],
 };
 const SEGMENTS=[
   {key:"vip_users",label:"VIP Users",labelZh:"VIP用户",slug:"seg.vip_users",desc:"High-value customers with premium engagement",descZh:"高价值优质用户",users:12400,rules:3,mult:0.88},
@@ -438,7 +451,7 @@ function CustomSelect({value,onChange,options}){
         <span style={{fontSize:10,color:C.muted,marginLeft:8,flexShrink:0,display:"inline-block",transform:open?"rotate(180deg)":"rotate(0deg)",transition:"transform 0.15s"}}>▼</span>
       </div>
       {open&&(
-        <div style={{position:"absolute",top:"calc(100% + 4px)",left:0,right:0,zIndex:500,background:C.card,border:`1px solid ${C.border2}`,borderRadius:6,boxShadow:"0 4px 16px rgba(0,0,0,0.12)",overflow:"hidden"}}>
+        <div style={{position:"absolute",top:"calc(100% + 4px)",left:0,right:0,zIndex:500,background:C.card,border:`1px solid ${C.border2}`,borderRadius:6,boxShadow:"0 4px 16px rgba(0,0,0,0.12)",maxHeight:280,overflowY:"auto"}}>
           {options.map(o=>(
             <div key={o.value} onClick={()=>{onChange(o.value);setOpen(false);}}
               style={{padding:"9px 12px",fontSize:12,cursor:"pointer",fontWeight:o.value===value?600:400,color:o.value===value?C.accent:C.text,background:o.value===value?C.accentBg:C.card,borderLeft:`3px solid ${o.value===value?C.accent:"transparent"}`}}
@@ -489,38 +502,24 @@ function SegmentRow({seg,active,onToggle,lang,onEnter,onLeave}){
     <div onClick={onToggle}
       onMouseEnter={e=>{const r=e.currentTarget.getBoundingClientRect();onEnter(seg,r.top+r.height/2,r.right+10);}}
       onMouseLeave={onLeave}
-      style={{display:"flex",alignItems:"center",gap:8,padding:"7px 8px",borderRadius:6,cursor:"pointer",border:`1px solid ${active?C.accent:C.border}`,background:active?C.accentBg:"transparent",transition:"all 0.1s"}}>
-      <div style={{width:14,height:14,borderRadius:3,border:`1.5px solid ${active?C.accent:C.border2}`,background:active?C.accent:"#fff",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-        {active&&<span style={{color:"#fff",fontSize:9,lineHeight:1,fontWeight:800}}>✓</span>}
-      </div>
+      style={{display:"flex",alignItems:"center",gap:8,padding:"9px 10px",borderRadius:6,cursor:"pointer",border:`1px solid ${active?C.accent:C.border}`,background:active?C.accentBg:"transparent",transition:"all 0.1s"}}>
+      <div style={{width:10,height:10,borderRadius:"50%",background:active?C.accent:C.border2,flexShrink:0}}/>
       <div style={{flex:1,minWidth:0}}>
         <div style={{fontSize:12,fontWeight:active?600:400,color:active?C.accent:C.text2,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{lang==="zh"?seg.labelZh:seg.label}</div>
-        <div style={{fontSize:9,color:C.muted,fontFamily:"monospace",marginTop:1}}>{seg.slug}</div>
       </div>
     </div>
   );
 }
  
-function SegmentFilterContent({activeFilters,toggleFilter,setActiveFilters,autoRun,lang,t,onEnter,onLeave}){
+function SegmentFilterContent({activeFilter,toggleFilter,setActiveFilter,autoRun,lang,t,onEnter,onLeave}){
   const [q,setQ]=useState("");
-  const filtered=SEGMENTS.filter(s=>q===""||s.label.toLowerCase().includes(q.toLowerCase())||s.slug.includes(q));
+  const filtered=SEGMENTS.filter(s=>q===""||s.label.toLowerCase().includes(q.toLowerCase()));
   return (
     <div>
-      {activeFilters.length>0&&(
-        <div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:8}}>
-          {activeFilters.map(key=>{const seg=SEGMENTS.find(s=>s.key===key);return seg?(
-            <div key={key} style={{display:"flex",alignItems:"center",gap:4,padding:"2px 4px 2px 8px",borderRadius:4,background:C.accentBg,border:`1px solid ${C.accentLight}`,fontSize:10,color:C.accent,fontWeight:600}}>
-              {lang==="zh"?seg.labelZh:seg.label}
-              <span onClick={()=>toggleFilter(key)} style={{cursor:"pointer",padding:"1px 4px",color:C.muted,fontSize:11}}>✕</span>
-            </div>
-          ):null;})}
-          <button onClick={()=>{setActiveFilters([]);autoRun();}} style={{fontSize:10,color:C.danger,background:"none",border:"none",cursor:"pointer",padding:"2px 4px"}}>{t.clearFilters}</button>
-        </div>
-      )}
       <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Search…" style={{width:"100%",padding:"5px 8px",borderRadius:5,border:`1px solid ${C.border2}`,fontSize:11,color:C.text,outline:"none",boxSizing:"border-box",marginBottom:6}}/>
       <div style={{maxHeight:200,overflowY:"auto",display:"flex",flexDirection:"column",gap:4}}>
         {filtered.length===0&&<div style={{fontSize:11,color:C.muted,textAlign:"center",padding:"10px 0"}}>{t.noResults}</div>}
-        {filtered.map(seg=><SegmentRow key={seg.key} seg={seg} lang={lang} active={activeFilters.includes(seg.key)} onToggle={()=>toggleFilter(seg.key)} onEnter={onEnter} onLeave={onLeave}/>)}
+        {filtered.map(seg=><SegmentRow key={seg.key} seg={seg} lang={lang} active={activeFilter===seg.key} onToggle={()=>toggleFilter(seg.key)} onEnter={onEnter} onLeave={onLeave}/>)}
       </div>
     </div>
   );
@@ -1560,7 +1559,7 @@ function FunnelPage({panelOpen,setPanel,setTab,descriptions,setDescriptions,setF
   const [convCalc,setConvCalc]=useState("overall");
   const [convWindowLimitNumber,setConvWindowLimitNumber]=useState(14);
   const [convWindowLimitUnit,setConvWindowLimitUnit]=useState("days");
-  const [activeFilters,setActiveFilters]=useState([]);
+  const [activeFilter,setActiveFilter]=useState(null);
   const [dragIdx,setDragIdx]=useState(null);
   const [dragOverIdx,setDragOverIdx]=useState(null);
   const scrollRef=useRef(null);
@@ -1619,12 +1618,28 @@ function FunnelPage({panelOpen,setPanel,setTab,descriptions,setDescriptions,setF
 
   const coloredBreakItems=useMemo(function(){return [BASELINE,...(BREAK_DEFS[breakBy]||[])].map(function(item,i){return {...item,color:C.seg[i]||C.muted};});},[breakBy]);
   const segmentMult=useMemo(function(){
-    if(!activeFilters.length)return 1;
-    return activeFilters.reduce(function(acc,key){const seg=SEGMENTS.find(function(s){return s.key===key;});return acc*(seg?seg.mult:1);},1);
-  },[activeFilters]);
-  const toggleFilter=function(key){setActiveFilters(function(prev){return prev.includes(key)?prev.filter(function(k){return k!==key;}):[...prev,key];});autoRun();};
+    if(!activeFilter)return 1;
+    const seg=SEGMENTS.find(function(s){return s.key===activeFilter;});
+    return seg?seg.mult:1;
+  },[activeFilter]);
+  const toggleFilter=function(key){setActiveFilter(function(prev){return prev===key?null:key;});autoRun();};
   const SESSION_MULT=1.45;
   const ORDER_MULT={sequential:1.0,strict:0.84,any:1.13};
+
+  const FEATURE_FLAG_SEGMENTS={
+    checkout_flow_test:"vip_users",
+  };
+
+  const handleBreakByChange=function(v){
+    setBreakBy(v);
+    const associatedSegment=FEATURE_FLAG_SEGMENTS[v];
+    if(associatedSegment){
+      setActiveFilter(associatedSegment);
+    }else if(activeFilter && FEATURE_FLAG_SEGMENTS[breakBy]===activeFilter){
+      setActiveFilter(null);
+    }
+    autoRun();
+  };
 
   const getStepLabel=function(ev,i,useGeneric){
     if(useGeneric){
@@ -1865,7 +1880,7 @@ function FunnelPage({panelOpen,setPanel,setTab,descriptions,setDescriptions,setF
               </div>
               <div>
                 <FieldLabel>{t.breakDownBy}</FieldLabel>
-                <CustomSelect value={breakBy} onChange={function(v){setBreakBy(v);autoRun();}} options={[{value:"none",label:t.noBreakdown},{value:"device",label:t.byDevice},{value:"status",label:t.byStatus},{value:"region",label:t.byRegion}]}/>
+                <CustomSelect value={breakBy} onChange={handleBreakByChange} options={[{value:"none",label:t.noBreakdown},{value:"device",label:t.byDevice},{value:"status",label:t.byStatus},{value:"region",label:t.byRegion},{value:"v2_search_algo",label:t.byV2SearchAlgo},{value:"checkout_flow_test",label:t.byCheckoutFlowTest},{value:"cny_festival_ui",label:t.byCnyFestivalUi}]}/>
                 <div style={{marginTop:8,padding:"8px 10px",borderRadius:6,background:C.bg,border:`1px solid ${C.border}`}}>
                   {coloredBreakItems.map(function(item){return(
                     <div key={item.key} style={{display:"flex",alignItems:"center",gap:7,marginBottom:4}}>
@@ -1882,10 +1897,10 @@ function FunnelPage({panelOpen,setPanel,setTab,descriptions,setDescriptions,setF
                   )}
                 </div>
               </div>
-              <CollapsibleSection label={t.segments} badge={activeFilters.length||null} badgeColor={C.accent}>
-                <SegmentFilterContent activeFilters={activeFilters} toggleFilter={toggleFilter} setActiveFilters={setActiveFilters} autoRun={autoRun} lang={lang} t={t}
-                  onEnter={function(seg,top,left){setTip({seg,top,left});}} onLeave={function(){setTip(null);}}/>
-              </CollapsibleSection>
+              <div>
+                <FieldLabel>Filter</FieldLabel>
+                <CustomSelect value={activeFilter||""} onChange={function(v){setActiveFilter(v===""?null:v);autoRun();}} options={[{value:"",label:"No filter"},...SEGMENTS.map(s=>({value:s.key,label:lang==="zh"?s.labelZh:s.label}))]}/>
+              </div>
               <CollapsibleSection label={t.presetFunnels} badge={activePreset?1:null} badgeColor={C.success}>
                 <PresetPanelContent customPresets={customPresets} loadingPresets={loadingPresets} activePreset={activePreset} expandedPreset={expandedPreset} setExpandedPreset={setExpandedPreset} loadPreset={loadPreset} setDeleteConfirm={setDeleteConfirm} setShowSaveModal={setShowSaveModal} steps={steps} lang={lang} t={t}/>
               </CollapsibleSection>
@@ -2674,6 +2689,28 @@ function TrendsPage({lang,dateRange}){
   const comparePrev=compareMode!=="none";
   const compareLabel=compareMode==="none"?"No comparison between periods":compareMode==="prev"?"Compare to previous period":compareMode==="custom"&&compareCustomStart?`Compare to ${new Date(compareCustomStart).toLocaleDateString()} - ${new Date(new Date(compareCustomStart).getTime() + periodDays*24*60*60*1000).toLocaleDateString()}`:`Compare to ${compareVal} ${compareUnit} earlier`;
   const [breakBy,setBreakBy]=useState("none");
+  const [activeFilter,setActiveFilter]=useState(null);
+
+  const FEATURE_FLAG_SEGMENTS={
+    checkout_flow_test:"vip_users",
+  };
+
+  const handleBreakByChange=function(v){
+    setBreakBy(v);
+    const associatedSegment=FEATURE_FLAG_SEGMENTS[v];
+    if(associatedSegment){
+      setActiveFilter(associatedSegment);
+    }else if(activeFilter && FEATURE_FLAG_SEGMENTS[breakBy]===activeFilter){
+      setActiveFilter(null);
+    }
+  };
+
+  const segmentMult=useMemo(function(){
+    if(!activeFilter)return 1;
+    const seg=SEGMENTS.find(function(s){return s.key===activeFilter;});
+    return seg?seg.mult:1;
+  },[activeFilter]);
+  const toggleFilter=function(key){setActiveFilter(function(prev){return prev===key?null:key;});};
 
   useEffect(()=>{
     if(!addOpen)return;
@@ -2892,10 +2929,15 @@ function TrendsPage({lang,dateRange}){
           <div style={{minWidth:180,display:"flex",flexDirection:"column",gap:12}}>
             <div>
               <div style={{fontSize:10,fontWeight:700,color:C.muted,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:8}}>Breakdown by</div>
-              <CustomSelect value={breakBy} onChange={setBreakBy} options={[
+              <CustomSelect value={breakBy} onChange={handleBreakByChange} options={[
                 {value:"none",label:"No breakdown"},{value:"device",label:"By Device"},
                 {value:"status",label:"By User Role"},{value:"region",label:"By Region"},
+                {value:"v2_search_algo",label:"By v2-search-algo"},{value:"checkout_flow_test",label:"By checkout-flow-test"},{value:"cny_festival_ui",label:"By cny-festival-ui"},
               ]}/>
+            </div>
+            <div>
+              <FieldLabel>Filter</FieldLabel>
+              <CustomSelect value={activeFilter||""} onChange={function(v){setActiveFilter(v===""?null:v);}} options={[{value:"",label:"No filter"},...SEGMENTS.map(s=>({value:s.key,label:lang==="zh"?s.labelZh:s.label}))]}/>
             </div>
             {seriesList.length>0&&<button onClick={()=>setSeriesList([])} style={{width:"100%",padding:"6px 12px",borderRadius:6,border:`1px solid ${C.border2}`,background:C.card,color:C.danger,fontSize:11,fontWeight:500,cursor:"pointer"}}>
               Clear all
