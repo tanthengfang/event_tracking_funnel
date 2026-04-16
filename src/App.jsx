@@ -453,10 +453,10 @@ function CustomSelect({value,onChange,options}){
       {open&&(
         <div style={{position:"absolute",top:"calc(100% + 4px)",left:0,right:0,zIndex:500,background:C.card,border:`1px solid ${C.border2}`,borderRadius:6,boxShadow:"0 4px 16px rgba(0,0,0,0.12)",maxHeight:280,overflowY:"auto"}}>
           {options.map(o=>(
-            <div key={o.value} onClick={()=>{onChange(o.value);setOpen(false);}}
-              style={{padding:"9px 12px",fontSize:12,cursor:"pointer",fontWeight:o.value===value?600:400,color:o.value===value?C.accent:C.text,background:o.value===value?C.accentBg:C.card,borderLeft:`3px solid ${o.value===value?C.accent:"transparent"}`}}
-              onMouseEnter={e=>{if(o.value!==value)e.currentTarget.style.background="#f9fafb";}}
-              onMouseLeave={e=>{if(o.value!==value)e.currentTarget.style.background=C.card;}}>
+            <div key={o.value} onClick={()=>{if(!o.disabled){onChange(o.value);setOpen(false);}}}
+              style={{padding:"9px 12px",fontSize:12,cursor:o.disabled?"not-allowed":"pointer",fontWeight:o.value===value?600:400,color:o.disabled?C.muted:o.value===value?C.accent:C.text,background:o.disabled?C.bg:o.value===value?C.accentBg:C.card,borderLeft:`3px solid ${o.value===value?C.accent:"transparent"}`,opacity:o.disabled?0.5:1}}
+              onMouseEnter={e=>{if(o.value!==value&&!o.disabled)e.currentTarget.style.background="#f9fafb";}}
+              onMouseLeave={e=>{if(o.value!==value&&!o.disabled)e.currentTarget.style.background=C.card;}}>
               <div>{o.label}</div>
               {o.desc&&<div style={{fontSize:10,color:C.muted,marginTop:2,fontWeight:400}}>{o.desc}</div>}
             </div>
@@ -1669,6 +1669,8 @@ function FunnelPage({panelOpen,setPanel,setTab,descriptions,setDescriptions,setF
     return lang==="zh"?ev.labelZh:ev.label;
   };
 
+  const isFilterLocked=FEATURE_FLAG_SEGMENTS[breakBy]&&FEATURE_FLAG_SEGMENTS[breakBy]===activeFilter;
+
   const breakdownData=useMemo(function(){
     if(!ran||steps.length<2)return [];
     const oMult=ORDER_MULT[stepOrder]||1.0;
@@ -1963,7 +1965,7 @@ function FunnelPage({panelOpen,setPanel,setTab,descriptions,setDescriptions,setF
               </div>
               <div>
                 <FieldLabel>Filter</FieldLabel>
-                <CustomSelect value={activeFilter||""} onChange={function(v){setActiveFilter(v===""?null:v);autoRun();}} options={[{value:"",label:"No filter"},...SEGMENTS.map(s=>({value:s.key,label:lang==="zh"?s.labelZh:s.label}))]}/>
+                <CustomSelect value={activeFilter||""} onChange={function(v){setActiveFilter(v===""?null:v);autoRun();}} options={[{value:"",label:"No filter",disabled:isFilterLocked&&activeFilter!=null},...SEGMENTS.map(s=>({value:s.key,label:lang==="zh"?s.labelZh:s.label,disabled:isFilterLocked&&s.key!==activeFilter}))]}/>
               </div>
               <CollapsibleSection label={t.presetFunnels} badge={activePreset?1:null} badgeColor={C.success}>
                 <PresetPanelContent customPresets={customPresets} loadingPresets={loadingPresets} activePreset={activePreset} expandedPreset={expandedPreset} setExpandedPreset={setExpandedPreset} loadPreset={loadPreset} setDeleteConfirm={setDeleteConfirm} setShowSaveModal={setShowSaveModal} steps={steps} lang={lang} t={t}/>
@@ -2797,6 +2799,8 @@ function TrendsPage({lang,dateRange}){
   },[activeFilter]);
   const toggleFilter=function(key){setActiveFilter(function(prev){return prev===key?null:key;});};
 
+  const isFilterLocked=FEATURE_FLAG_SEGMENTS[breakBy]&&FEATURE_FLAG_SEGMENTS[breakBy]===activeFilter;
+
   const filteredBreakdown=breakdownOptions.filter(opt=>
     (breakdownFilter==="all"||opt.category===breakdownFilter)&&
     opt.label.toLowerCase().includes(breakdownSearch.toLowerCase())
@@ -3061,7 +3065,7 @@ function TrendsPage({lang,dateRange}){
             </div>
             <div>
               <FieldLabel>Filter</FieldLabel>
-              <CustomSelect value={activeFilter||""} onChange={function(v){setActiveFilter(v===""?null:v);}} options={[{value:"",label:"No filter"},...SEGMENTS.map(s=>({value:s.key,label:lang==="zh"?s.labelZh:s.label}))]}/>
+              <CustomSelect value={activeFilter||""} onChange={function(v){setActiveFilter(v===""?null:v);}} options={[{value:"",label:"No filter",disabled:isFilterLocked&&activeFilter!=null},...SEGMENTS.map(s=>({value:s.key,label:lang==="zh"?s.labelZh:s.label,disabled:isFilterLocked&&s.key!==activeFilter}))]}/>
             </div>
             {seriesList.length>0&&<button onClick={()=>setSeriesList([])} style={{width:"100%",padding:"6px 12px",borderRadius:6,border:`1px solid ${C.border2}`,background:C.card,color:C.danger,fontSize:11,fontWeight:500,cursor:"pointer"}}>
               Clear all
