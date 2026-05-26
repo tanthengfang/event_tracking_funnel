@@ -2454,6 +2454,28 @@ function CorrelationPage(){
   );
 }
 
+function ToggleSwitch({checked,onChange,disabled=false}){
+  return(
+    <div onClick={!disabled?onChange:undefined}
+      style={{width:28,height:16,borderRadius:8,
+        background:checked?C.accent:"#d1d5db",
+        cursor:disabled?"not-allowed":"pointer",
+        opacity:disabled?0.4:1,
+        position:"relative",transition:"background 0.15s",
+        flexShrink:0,
+      }}>
+      <div style={{
+        position:"absolute",top:2,
+        left:checked?14:2,
+        width:12,height:12,borderRadius:"50%",
+        background:"#fff",
+        boxShadow:"0 1px 2px rgba(0,0,0,0.18)",
+        transition:"left 0.15s",
+      }}/>
+    </div>
+  );
+}
+
 function EventDefinitionsPage({descriptions,setDescriptions}){
   const lang=useLang();
   const [search,setSearch]=useState("");
@@ -2463,6 +2485,31 @@ function EventDefinitionsPage({descriptions,setDescriptions}){
   const [editingId,setEditingId]=useState(null);
   const [editDraft,setEditDraft]=useState("");
   const editRef=useRef();
+
+  /* ── Toggle state (Level 1 / 2 / 3) ─────────────────────────────────── */
+  const [globalEnabled,setGlobalEnabled]=useState(true);
+  const [categoryEnabled,setCategoryEnabled]=useState(()=>{
+    const s={};Object.keys(TAG_COLORS).forEach(tag=>{s[tag]=true;});return s;
+  });
+  const [eventEnabled,setEventEnabled]=useState(()=>{
+    const s={};ALL_EVENTS.forEach(ev=>{s[ev.id]=true;});return s;
+  });
+  const toggleCategory=(tag)=>setCategoryEnabled(p=>({...p,[tag]:!p[tag]}));
+  const toggleEvent=(id)=>setEventEnabled(p=>({...p,[id]:!p[id]}));
+  /* ──────────────────────────────────────────────────────────────────────── */
+
+  /* ── Sampling state ───────────────────────────────────────────────────── */
+  const [samplingRate,setSamplingRate]=useState(10);
+  const [samplingTipOpen,setSamplingTipOpen]=useState(false);
+  const samplingTipRef=useRef();
+  useEffect(()=>{
+    if(!samplingTipOpen)return;
+    const h=e=>{if(samplingTipRef.current&&!samplingTipRef.current.contains(e.target))setSamplingTipOpen(false);};
+    document.addEventListener("mousedown",h);
+    return()=>document.removeEventListener("mousedown",h);
+  },[samplingTipOpen]);
+  /* ──────────────────────────────────────────────────────────────────────── */
+
   const typeOpts=[
     {key:"All",label:"All Types"},
     {key:"pageview",label:"Page Views",color:TYPE_COLORS.pageview},
@@ -2477,9 +2524,7 @@ function EventDefinitionsPage({descriptions,setDescriptions}){
         const mtype=typeFilter==="All"||e.type===typeFilter;
         return ms&&mt&&mtype;
       })
-      .sort(function(a,b){
-        return a.tag.localeCompare(b.tag);
-      });
+      .sort(function(a,b){return a.tag.localeCompare(b.tag);});
   },[search,tagFilter,typeFilter]);
   const startEdit=function(id){setEditingId(id);setEditDraft(descriptions[id]||"");setTimeout(function(){if(editRef.current)editRef.current.focus();},50);};
   const saveEdit=function(id){setDescriptions(function(prev){const n={...prev};n[id]=editDraft.trim();return n;});setEditingId(null);};
@@ -2488,10 +2533,7 @@ function EventDefinitionsPage({descriptions,setDescriptions}){
     filtered.forEach(ev=>{if(!groups[ev.tag])groups[ev.tag]=[];groups[ev.tag].push(ev);});
     Object.keys(groups).forEach(tag=>{
       groups[tag].sort(function(a,b){
-        if(a.type!==b.type){
-          if(a.type==="pageview")return -1;
-          if(b.type==="pageview")return 1;
-        }
+        if(a.type!==b.type){if(a.type==="pageview")return -1;if(b.type==="pageview")return 1;}
         return sortDir==="asc"?a.label.localeCompare(b.label):b.label.localeCompare(a.label);
       });
     });
@@ -2499,6 +2541,7 @@ function EventDefinitionsPage({descriptions,setDescriptions}){
   },[filtered,sortDir]);
   const tagOrder=Object.keys(TAG_COLORS);
   const groupKeys=tagOrder.filter(t=>groupedByTag[t]);
+
   return (
     <div style={{display:"flex",flexDirection:"column",gap:0}}>
       <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:16}}>
@@ -2522,6 +2565,12 @@ function EventDefinitionsPage({descriptions,setDescriptions}){
               </button>
             );})}
           </div>
+          {/* ── Level 1: Global Toggle ── */}
+          <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:7,flexShrink:0}}>
+            <span style={{fontSize:11,fontWeight:600,color:C.muted}}>Event Tracking</span>
+            <ToggleSwitch checked={globalEnabled} onChange={()=>setGlobalEnabled(v=>!v)}/>
+            <span style={{fontSize:11,fontWeight:700,color:globalEnabled?C.accent:C.muted}}>{globalEnabled?"ON":"OFF"}</span>
+          </div>
         </div>
         <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}>
           <span style={{fontSize:11,fontWeight:600,color:C.muted,flexShrink:0}}>Tag</span>
@@ -2533,36 +2582,103 @@ function EventDefinitionsPage({descriptions,setDescriptions}){
               </button>
             );})}
           </div>
+          {/* ── Sampling Rate ── */}
+          <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:6,flexShrink:0}}>
+            <span style={{fontSize:11,fontWeight:600,color:C.muted}}>Sampling</span>
+            <div style={{display:"flex",alignItems:"center",border:`1px solid ${C.border2}`,borderRadius:5,background:C.card,overflow:"hidden"}}>
+              <input
+                type="number" min={1} max={100} value={samplingRate}
+                onChange={e=>setSamplingRate(Math.min(100,Math.max(1,parseInt(e.target.value)||1)))}
+                style={{width:38,padding:"3px 6px",border:"none",outline:"none",fontSize:11,color:C.text,background:"transparent",textAlign:"right",MozAppearance:"textfield"}}
+              />
+              <span style={{fontSize:11,color:C.muted,paddingRight:7,paddingLeft:1}}>%</span>
+            </div>
+            <div ref={samplingTipRef} style={{position:"relative",display:"flex",alignItems:"center"}}>
+              <button
+                onClick={()=>setSamplingTipOpen(v=>!v)}
+                style={{width:15,height:15,borderRadius:"50%",border:`1px solid ${samplingTipOpen?C.accent:C.border2}`,background:samplingTipOpen?C.accentBg:"transparent",color:samplingTipOpen?C.accent:C.muted,fontSize:9,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",padding:0,lineHeight:1,flexShrink:0}}>
+                ?
+              </button>
+              {samplingTipOpen&&(
+                <div style={{position:"absolute",top:"calc(100% + 6px)",right:0,zIndex:500,width:260,background:C.card,border:`1px solid ${C.border2}`,borderRadius:7,boxShadow:"0 4px 16px rgba(0,0,0,0.10)",padding:"10px 12px"}}>
+                  <div style={{display:"flex",alignItems:"center",gap:5,marginBottom:5}}>
+                    <span style={{fontSize:12}}>⚠️</span>
+                    <span style={{fontSize:11,fontWeight:600,color:C.warn}}>Rate change warning</span>
+                  </div>
+                  <p style={{fontSize:11,color:C.text3,lineHeight:1.6,margin:0}}>
+                    Editing the sampling rate may cause broken journeys. Analyses crossing a rate change date are unreliable.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
+
       <div style={{display:"flex",flexDirection:"column",gap:12}}>
         {groupKeys.map(function(tag){
           const evs=groupedByTag[tag];
           if(!evs||!evs.length)return null;
           const tagColor=TAG_COLORS[tag]||C.muted;
+          /* Level 2 derived state */
+          const catOn=categoryEnabled[tag]!==false;
+          const catDisabled=!globalEnabled;           /* greyed when L1 is off */
+          const catEffectiveOn=globalEnabled&&catOn;  /* truly active */
           return (
-            <div key={tag} style={{background:C.card,borderRadius:8,border:`1px solid ${C.border}`,overflow:"hidden",boxShadow:"0 1px 3px rgba(0,0,0,0.04)"}}>
-              <div style={{display:"flex",alignItems:"center",gap:10,padding:"10px 18px",background:tagColor+"0d",borderBottom:`1px solid ${tagColor}25`}}>
-                <div style={{width:10,height:10,borderRadius:2,background:tagColor}}/>
-                <span style={{fontSize:12,fontWeight:700,color:tagColor}}>{tag}</span>
-                <span style={{fontSize:10,color:tagColor,opacity:0.7}}>{evs.length} event{evs.length!==1?"s":""}</span>
-                <div style={{marginLeft:"auto",cursor:"pointer",fontSize:10,color:C.muted}} onClick={()=>setSortDir(d=>d==="asc"?"desc":"asc")}>Name {sortDir==="asc"?"↑":"↓"}</div>
+            <div key={tag} style={{
+              background:C.card,borderRadius:8,overflow:"hidden",
+              border:`1px solid ${catEffectiveOn?C.border:C.border2}`,
+              boxShadow:"0 1px 3px rgba(0,0,0,0.04)",
+              opacity:catDisabled?0.72:1,
+              transition:"opacity 0.2s",
+            }}>
+              {/* ═══════════════════════════════════════════════════════════
+                  LEVEL 2 — Category Toggle
+                  ═══════════════════════════════════════════════════════════ */}
+              <div style={{
+                display:"flex",alignItems:"center",gap:10,padding:"10px 18px",
+                background:catEffectiveOn?tagColor+"0d":"#f9fafb",
+                borderBottom:`1px solid ${catEffectiveOn?tagColor+"25":C.border}`,
+              }}>
+                <div style={{width:10,height:10,borderRadius:2,background:catEffectiveOn?tagColor:C.border2,flexShrink:0}}/>
+                <span style={{fontSize:12,fontWeight:700,color:catEffectiveOn?tagColor:C.muted}}>{tag}</span>
+                <span style={{fontSize:10,color:catEffectiveOn?tagColor:C.muted,opacity:0.7}}>{evs.length} event{evs.length!==1?"s":""}</span>
+                <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:12}}>
+                  <div style={{cursor:"pointer",fontSize:10,color:C.muted}} onClick={()=>setSortDir(d=>d==="asc"?"desc":"asc")}>Name {sortDir==="asc"?"↑":"↓"}</div>
+                  <div style={{display:"flex",alignItems:"center",gap:6}}>
+                    <ToggleSwitch checked={catOn} onChange={()=>toggleCategory(tag)} disabled={catDisabled}/>
+                    <span style={{fontSize:10,fontWeight:600,color:catDisabled?C.muted:catOn?tagColor:C.muted}}>
+                      {catOn?"ON":"OFF"}
+                    </span>
+                  </div>
+                </div>
               </div>
+              {/* ═══════════════════════════════════════════════════════════ */}
+
               {evs.map(function(ev,i){
                 const isEditing=editingId===ev.id;
                 const desc=descriptions[ev.id]||"";
                 const isLast=i===evs.length-1;
                 const evTypeColor=TYPE_COLORS[ev.type]||C.muted;
                 const evTypeLabel=TYPE_LABELS[ev.type]||ev.type;
+                /* Level 3 derived state */
+                const evOn=eventEnabled[ev.id]!==false;
+                const evDisabled=!globalEnabled||!catOn;   /* greyed when L1 or L2 is off */
+                const evEffectiveOn=globalEnabled&&catOn&&evOn;
                 return (
-                  <div key={ev.id} style={{borderBottom:isLast?"none":`1px solid ${C.border}`,background:isEditing?C.accentBg:"transparent"}}>
-                    <div style={{display:"grid",gridTemplateColumns:"1fr 120px 90px",padding:"12px 18px",alignItems:"center",gap:8}}>
+                  <div key={ev.id} style={{
+                    borderBottom:isLast?"none":`1px solid ${C.border}`,
+                    background:isEditing?C.accentBg:"transparent",
+                    opacity:evDisabled?0.58:1,
+                    transition:"opacity 0.2s",
+                  }}>
+                    <div style={{display:"grid",gridTemplateColumns:"1fr 120px 72px 90px",padding:"12px 18px",alignItems:"center",gap:8}}>
                       <div style={{paddingRight:12}}>
                         <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:3,flexWrap:"wrap"}}>
-                          <span style={{fontSize:12,fontWeight:600,color:C.text,fontFamily:"monospace"}}>{ev.id}</span>
+                          <span style={{fontSize:12,fontWeight:600,color:evEffectiveOn?C.text:C.muted,fontFamily:"monospace"}}>{ev.id}</span>
                           {lang==="zh"&&<span style={{fontSize:11,color:C.muted}}>· {ev.labelZh}</span>}
                         </div>
-                        <div style={{fontSize:12,color:C.text2,marginBottom:4}}>{ev.label}</div>
+                        <div style={{fontSize:12,color:evEffectiveOn?C.text2:C.muted,marginBottom:4}}>{ev.label}</div>
                         {isEditing?(
                           <div>
                             <textarea ref={editRef} value={editDraft} onChange={e=>setEditDraft(e.target.value)} rows={2}
@@ -2573,13 +2689,24 @@ function EventDefinitionsPage({descriptions,setDescriptions}){
                             </div>
                           </div>
                         ):(
-                          desc?<div style={{fontSize:11,color:C.text3,lineHeight:1.5}}>{desc}</div>
+                          desc
+                            ?<div style={{fontSize:11,color:evEffectiveOn?C.text3:C.muted,lineHeight:1.5}}>{desc}</div>
                             :<div style={{fontSize:11,color:C.muted,fontStyle:"italic"}}>No description —</div>
                         )}
                       </div>
                       <div>
-                        <span style={{fontSize:11,padding:"3px 8px",borderRadius:4,background:evTypeColor+"15",color:evTypeColor,fontWeight:600,border:`1px solid ${evTypeColor}30`}}>{evTypeLabel}</span>
+                        <span style={{fontSize:11,padding:"3px 8px",borderRadius:4,background:evTypeColor+"15",color:evEffectiveOn?evTypeColor:C.muted,fontWeight:600,border:`1px solid ${evTypeColor}30`}}>{evTypeLabel}</span>
                       </div>
+                      {/* ═══════════════════════════════════════════════════
+                          LEVEL 3 — Event Toggle
+                          ═══════════════════════════════════════════════════ */}
+                      <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,height:"100%"}}>
+                        <ToggleSwitch checked={evOn} onChange={()=>toggleEvent(ev.id)} disabled={evDisabled}/>
+                        <span style={{fontSize:9,fontWeight:700,color:evDisabled?C.muted:evOn?C.accent:C.muted}}>
+                          {evOn?"ON":"OFF"}
+                        </span>
+                      </div>
+                      {/* ═══════════════════════════════════════════════════ */}
                       <div>
                         {!isEditing&&(
                           <button onClick={()=>startEdit(ev.id)}
