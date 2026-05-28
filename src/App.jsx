@@ -241,47 +241,70 @@ const useT = () => {
 };
  
 const ALL_EVENTS = [
+  // ── Registration ──────────────────────────────────────────────────────────
   {id:"account_created",label:"Account Created",labelZh:"账户已创建",tag:"Registration",type:"custom"},
-  {id:"referral_code_entered",label:"Referral Code Entered",labelZh:"输入推荐码",tag:"Registration",type:"custom"},
-  {id:"onboarding_started",label:"Onboarding Started",labelZh:"引导流程开始",tag:"Registration",type:"custom"},
-  {id:"first_page_viewed",label:"First Page Viewed",labelZh:"首次查看页面",tag:"Registration",type:"pageview"},
+  {id:"onboarding_page_viewed",label:"Onboarding Page Viewed",labelZh:"查看引导页面",tag:"Registration",type:"pageview"},
+  {id:"onboarding_page_skipped",label:"Onboarding Page Skipped",labelZh:"跳过引导页面",tag:"Registration",type:"custom"},
+  {id:"home_page_viewed",label:"Home Page Viewed",labelZh:"查看首页",tag:"Registration",type:"pageview"},
   {id:"email_binded",label:"Email Account Binded",labelZh:"绑定邮箱账户",tag:"Registration",type:"custom"},
+  {id:"referral_code_entered",label:"Referral Code Entered",labelZh:"输入推荐码",tag:"Registration",type:"custom"},
+  // ── Nodes ─────────────────────────────────────────────────────────────────
   {id:"server_list_viewed",label:"Server List Viewed",labelZh:"查看服务器列表",tag:"Nodes",type:"pageview"},
   {id:"node_selected",label:"Node Selected",labelZh:"选择节点",tag:"Nodes",type:"custom"},
   {id:"node_connected",label:"Node Connected Successfully",labelZh:"节点连接成功",tag:"Nodes",type:"custom"},
-  {id:"node_connection_failed",label:"Node Connection Failed",labelZh:"节点连接失败",tag:"Nodes",type:"custom"},
   {id:"vpn_session_1min",label:"Session > 1 min",labelZh:"会话 > 1 分钟",tag:"Nodes",type:"custom"},
   {id:"vpn_session_10min",label:"Session > 10 min",labelZh:"会话 > 10 分钟",tag:"Nodes",type:"custom"},
   {id:"disconnect_clicked",label:"Disconnect Clicked",labelZh:"点击断开连接",tag:"Nodes",type:"custom"},
   {id:"connect_node_clicked",label:"Connect Node Clicked",labelZh:"点击连接节点",tag:"Nodes",type:"custom"},
+  {id:"node_connection_failed",label:"Node Connection Failed",labelZh:"节点连接失败",tag:"Nodes",type:"custom"},
   {id:"smart_mode_opened",label:"Smart Mode Opened",labelZh:"打开智能模式",tag:"Nodes",type:"custom"},
   {id:"feedback_submitted",label:"Feedback Submitted",labelZh:"提交反馈",tag:"Nodes",type:"custom"},
+  {id:"latency_test_clicked",label:"Latency Test Clicked",labelZh:"点击延迟测试",tag:"Nodes",type:"custom"},
+  // ── Referral ──────────────────────────────────────────────────────────────
   {id:"referral_entry_seen",label:"Referral Entry Viewed",labelZh:"查看推荐入口",tag:"Referral",type:"pageview"},
   {id:"referral_link_shared",label:"Referral Link Shared",labelZh:"分享推荐链接",tag:"Referral",type:"custom"},
   {id:"referral_poster_shared",label:"Referral Poster Shared",labelZh:"分享推荐海报",tag:"Referral",type:"custom"},
+  // ── Monetisation ──────────────────────────────────────────────────────────
   {id:"paywall_viewed",label:"Paywall Viewed",labelZh:"查看付费墙",tag:"Monetisation",type:"pageview"},
   {id:"plan_selected",label:"Plan Selected",labelZh:"选择套餐",tag:"Monetisation",type:"custom"},
-  {id:"payment_method_viewed",label:"Payment Method Viewed",labelZh:"查看支付方式",tag:"Monetisation",type:"pageview"},
-  {id:"payment_initiated",label:"Payment Initiated",labelZh:"发起支付",tag:"Monetisation",type:"custom"},
+  {id:"wechat_pay_selected",label:"WeChat Pay Selected",labelZh:"选择微信支付",tag:"Monetisation",type:"custom"},
+  {id:"payment_detail_page_viewed",label:"Payment Detail Page Viewed",labelZh:"查看支付详情页",tag:"Monetisation",type:"pageview"},
   {id:"payment_completed",label:"Payment Completed",labelZh:"支付成功",tag:"Monetisation",type:"custom"},
+  {id:"alipay_selected",label:"Alipay Selected",labelZh:"选择支付宝",tag:"Monetisation",type:"custom"},
+  {id:"crypto_pay_selected",label:"Crypto Pay Selected",labelZh:"选择加密货币支付",tag:"Monetisation",type:"custom"},
   {id:"plan_expired_toast_clicked",label:"Plan Expired Toast Clicked",labelZh:"套餐到期提示已点击",tag:"Monetisation",type:"custom"},
+  {id:"payment_detail_page_blocked",label:"Payment Detail Page Blocked",labelZh:"支付详情页被拦截",tag:"Monetisation",type:"custom"},
+  // ── Tasks ─────────────────────────────────────────────────────────────────
   {id:"task_centre_opened",label:"Task Centre Viewed",labelZh:"查看任务中心",tag:"Tasks",type:"pageview"},
   {id:"comment_task_selected",label:"Comment Task Selected",labelZh:"选择评论任务",tag:"Tasks",type:"custom"},
-  {id:"task_completed",label:"Task Completed",labelZh:"完成任务",tag:"Tasks",type:"custom"},
+  {id:"task_initiated",label:"Task Initiated",labelZh:"发起任务",tag:"Tasks",type:"custom"},
+  {id:"review_page_viewed",label:"Review Page Viewed",labelZh:"查看评价页面",tag:"Tasks",type:"pageview"},
   {id:"proof_submitted",label:"Proof Submitted",labelZh:"提交证明",tag:"Tasks",type:"custom"},
   {id:"binding_task_selected",label:"Email Binding Task Selected",labelZh:"选择绑定任务",tag:"Tasks",type:"custom"},
   {id:"sharing_task_selected",label:"Sharing Task Selected",labelZh:"选择分享任务",tag:"Tasks",type:"custom"},
   {id:"follow_task_selected",label:"Follow Task Selected",labelZh:"选择关注任务",tag:"Tasks",type:"custom"},
-  {id:"ai_chat_page_viewed",label:"AI Chat Page Viewed",labelZh:"查看AI聊天页面",tag:"Image Generation",type:"pageview"},
-  {id:"image_generation_requested",label:"Image Generation Requested",labelZh:"发起图像生成",tag:"Image Generation",type:"custom"},
-  {id:"image_generation_confirmed",label:"Image Generation Confirmation Selected",labelZh:"确认图像生成",tag:"Image Generation",type:"custom"},
-  {id:"use_30pts_unlock_selected",label:"Use 30 Points Unlock Selected",labelZh:"选择30积分解锁",tag:"Image Generation",type:"custom"},
-  {id:"earn_pts_via_tasks_selected",label:"Earn Points via Tasks Selected",labelZh:"选择任务赚积分",tag:"Image Generation",type:"custom"},
-  {id:"support_entry_viewed",label:"Support Entry Viewed",labelZh:"查看客服入口",tag:"Support",type:"pageview"},
+  // ── Support ───────────────────────────────────────────────────────────────
+  {id:"support_page_viewed",label:"Support Page Viewed",labelZh:"查看客服页面",tag:"Support",type:"pageview"},
   {id:"ticket_submitted",label:"Ticket Submitted",labelZh:"提交工单",tag:"Support",type:"custom"},
   {id:"faq_card_clicked",label:"FAQ Card Clicked",labelZh:"点击FAQ卡片",tag:"Support",type:"custom"},
   {id:"faq_search_used",label:"FAQ Search Used",labelZh:"使用FAQ搜索",tag:"Support",type:"custom"},
   {id:"ticket_list_viewed",label:"Ticket List Viewed",labelZh:"查看工单列表",tag:"Support",type:"pageview"},
+  // ── Image Generation ──────────────────────────────────────────────────────
+  {id:"ai_chat_page_viewed",label:"AI Chat Page Viewed",labelZh:"查看AI聊天页面",tag:"Image Generation",type:"pageview"},
+  {id:"image_generation_requested",label:"Image Generation Requested",labelZh:"发起图像生成",tag:"Image Generation",type:"custom"},
+  {id:"image_generation_confirmed",label:"Image Generation Confirmation Selected",labelZh:"确认图像生成",tag:"Image Generation",type:"custom"},
+  {id:"use_30pts_unlock_selected",label:"Use Credit Points Unlock Selected",labelZh:"选择积分解锁",tag:"Image Generation",type:"custom"},
+  {id:"earn_pts_via_tasks_selected",label:"Earn Credit Points via Tasks Selected",labelZh:"选择任务赚积分",tag:"Image Generation",type:"custom"},
+  // ── Settings ──────────────────────────────────────────────────────────────
+  {id:"other_settings_page_viewed",label:"Other Settings Page Viewed",labelZh:"查看其他设置页面",tag:"Settings",type:"pageview"},
+  {id:"connection_safeguard_mode_clicked",label:"Connection Safeguard Mode Clicked",labelZh:"点击连接保护模式",tag:"Settings",type:"custom"},
+  {id:"application_mode_page_viewed",label:"Application Mode Page Viewed",labelZh:"查看应用模式页面",tag:"Settings",type:"pageview"},
+  {id:"manage_excluded_apps_clicked",label:"Manage Excluded Apps Clicked",labelZh:"点击管理排除应用",tag:"Settings",type:"custom"},
+  {id:"stable_mode_clicked",label:"Stable Mode Clicked",labelZh:"点击稳定模式",tag:"Settings",type:"custom"},
+  {id:"use_local_dns_clicked",label:"Use Local DNS Clicked",labelZh:"点击使用本地DNS",tag:"Settings",type:"custom"},
+  {id:"manage_excluded_website_clicked",label:"Manage Excluded Website Clicked",labelZh:"点击管理排除网站",tag:"Settings",type:"custom"},
+  {id:"ad_block_clicked",label:"Ad-Block Clicked",labelZh:"点击广告拦截",tag:"Settings",type:"custom"},
+  {id:"tun2proxy_toggle_clicked",label:"Tun2Proxy Toggle Clicked",labelZh:"点击Tun2Proxy开关",tag:"Settings",type:"custom"},
 ];
  
 const TYPE_COLORS={pageview:"#0f766e",custom:"#7c3aed"};
@@ -290,102 +313,133 @@ const TYPE_LABELS={pageview:"Page View",custom:"Custom Event"};
 const genSeriesColor=(index)=>{const colors=["#3A3A3A","#5BA3D0","#6BA085","#8FA5C4","#C4A5A8","#A89070","#2F2F2F","#4A90B8","#70A89A","#7FA3D0","#D0A5B0","#9B8B75"];return colors[index%colors.length];};
 const TAG_COLORS={
   Registration:"#5BA3D0",Nodes:"#3A3A3A",Referral:"#6BA085",
-  Monetisation:"#A89070",Tasks:"#70A89A","Image Generation":"#8FA5C4",Support:"#C4A5A8",
+  Monetisation:"#A89070",Tasks:"#70A89A","Image Generation":"#8FA5C4",Support:"#C4A5A8",Settings:"#9B7EC8",
 };
  
 const BUILT_IN_PRESETS={
   registration:{label:"Registration",labelZh:"注册流程",builtIn:true,
-    steps:["account_created","referral_code_entered","onboarding_started","first_page_viewed"],
-    others:["email_binded"]},
+    steps:["account_created","onboarding_page_viewed","onboarding_page_skipped","home_page_viewed"],
+    others:["email_binded","referral_code_entered"]},
   nodes:{label:"Node Usage",labelZh:"节点使用",builtIn:true,
     steps:["server_list_viewed","node_selected","node_connected","vpn_session_1min","vpn_session_10min","disconnect_clicked"],
-    others:["node_connection_failed","connect_node_clicked","smart_mode_opened","feedback_submitted"]},
+    others:["connect_node_clicked","node_connection_failed","smart_mode_opened","feedback_submitted","latency_test_clicked"]},
   referral:{label:"Referral",labelZh:"推荐流程",builtIn:true,
     steps:["referral_entry_seen","referral_link_shared"],
     others:["referral_poster_shared"]},
   monetisation:{label:"Monetisation",labelZh:"变现流程",builtIn:true,
-    steps:["paywall_viewed","plan_selected","payment_method_viewed","payment_initiated","payment_completed"],
-    others:["plan_expired_toast_clicked"]},
+    steps:["paywall_viewed","plan_selected","wechat_pay_selected","payment_detail_page_viewed","payment_completed"],
+    others:["alipay_selected","crypto_pay_selected","plan_expired_toast_clicked","payment_detail_page_blocked"]},
   tasks:{label:"Tasks",labelZh:"任务流程",builtIn:true,
-    steps:["task_centre_opened","comment_task_selected","task_completed","proof_submitted"],
+    steps:["task_centre_opened","comment_task_selected","task_initiated","review_page_viewed","proof_submitted"],
     others:["binding_task_selected","sharing_task_selected","follow_task_selected"]},
+  support:{label:"Support System",labelZh:"客服系统",builtIn:true,
+    steps:["support_page_viewed","ticket_submitted"],
+    others:["faq_card_clicked","faq_search_used","ticket_list_viewed"]},
   image_generation:{label:"Image Generation",labelZh:"图像生成",builtIn:true,
     steps:["ai_chat_page_viewed","image_generation_requested","image_generation_confirmed"],
     others:["use_30pts_unlock_selected","earn_pts_via_tasks_selected"]},
-  support:{label:"Support System",labelZh:"客服系统",builtIn:true,
-    steps:[],
-    others:["support_entry_viewed","ticket_submitted","faq_card_clicked","faq_search_used","ticket_list_viewed"]},
+  settings:{label:"Settings",labelZh:"设置",builtIn:true,
+    steps:["other_settings_page_viewed","connection_safeguard_mode_clicked"],
+    others:["application_mode_page_viewed","manage_excluded_apps_clicked","stable_mode_clicked","use_local_dns_clicked","manage_excluded_website_clicked","ad_block_clicked","tun2proxy_toggle_clicked"]},
 };
  
 const BASE_COUNTS={
-  account_created:21200,referral_code_entered:7820,onboarding_started:24200,first_page_viewed:18900,email_binded:9400,
-  server_list_viewed:18600,node_selected:16200,node_connected:14800,node_connection_failed:1800,vpn_session_1min:10800,vpn_session_10min:8400,disconnect_clicked:7200,
-  connect_node_clicked:14200,smart_mode_opened:4200,feedback_submitted:1800,
+  account_created:21200,onboarding_page_viewed:20800,onboarding_page_skipped:8400,home_page_viewed:19600,email_binded:9400,referral_code_entered:7820,
+  server_list_viewed:18600,node_selected:16200,node_connected:14800,vpn_session_1min:10800,vpn_session_10min:8400,disconnect_clicked:7200,
+  connect_node_clicked:14200,node_connection_failed:1800,smart_mode_opened:4200,feedback_submitted:1800,latency_test_clicked:5600,
   referral_entry_seen:9800,referral_link_shared:3920,referral_poster_shared:1640,
-  paywall_viewed:10800,plan_selected:6400,payment_method_viewed:4200,payment_initiated:4820,payment_completed:2890,plan_expired_toast_clicked:1840,
-  task_centre_opened:8200,comment_task_selected:3200,task_completed:3280,proof_submitted:2800,
+  paywall_viewed:10800,plan_selected:6400,wechat_pay_selected:3800,payment_detail_page_viewed:3600,payment_completed:2890,
+  alipay_selected:1200,crypto_pay_selected:400,plan_expired_toast_clicked:1840,payment_detail_page_blocked:800,
+  task_centre_opened:8200,comment_task_selected:3200,task_initiated:3100,review_page_viewed:2900,proof_submitted:2800,
   binding_task_selected:2100,sharing_task_selected:2600,follow_task_selected:4200,
-  ai_chat_page_viewed:6400,image_generation_requested:4200,image_generation_confirmed:3100,generated_image_viewed:2900,
+  support_page_viewed:5600,ticket_submitted:1200,faq_card_clicked:3800,faq_search_used:2400,ticket_list_viewed:900,
+  ai_chat_page_viewed:6400,image_generation_requested:4200,image_generation_confirmed:3100,
   use_30pts_unlock_selected:1200,earn_pts_via_tasks_selected:980,
-  support_entry_viewed:5600,ticket_submitted:1200,faq_card_clicked:3800,faq_search_used:2400,ticket_list_viewed:900,
+  other_settings_page_viewed:4200,connection_safeguard_mode_clicked:1800,application_mode_page_viewed:3100,manage_excluded_apps_clicked:1400,
+  stable_mode_clicked:2200,use_local_dns_clicked:1600,manage_excluded_website_clicked:900,ad_block_clicked:3400,tun2proxy_toggle_clicked:1100,
 };
  
 const AVG_TIME={
-  account_created:0.3,referral_code_entered:0.5,onboarding_started:0.05,first_page_viewed:0.08,email_binded:0.2,
+  account_created:0.3,onboarding_page_viewed:0.5,onboarding_page_skipped:0.1,home_page_viewed:0.08,email_binded:0.2,referral_code_entered:0.5,
   server_list_viewed:0.05,node_selected:0.08,node_connected:0.01,vpn_session_1min:0.02,vpn_session_10min:0.15,disconnect_clicked:0.03,
-  connect_node_clicked:0.05,smart_mode_opened:0.1,feedback_submitted:2.0,
+  connect_node_clicked:0.05,node_connection_failed:null,smart_mode_opened:0.1,feedback_submitted:2.0,latency_test_clicked:0.05,
   referral_entry_seen:6.0,referral_link_shared:0.5,referral_poster_shared:0.8,
-  paywall_viewed:4.0,plan_selected:0.1,payment_method_viewed:0.12,payment_initiated:0.08,payment_completed:0.05,plan_expired_toast_clicked:720.0,
-  task_centre_opened:1.5,comment_task_selected:0.15,task_completed:0.8,proof_submitted:1.0,
+  paywall_viewed:4.0,plan_selected:0.1,wechat_pay_selected:0.08,payment_detail_page_viewed:0.12,payment_completed:0.05,
+  alipay_selected:0.08,crypto_pay_selected:0.1,plan_expired_toast_clicked:720.0,payment_detail_page_blocked:null,
+  task_centre_opened:1.5,comment_task_selected:0.15,task_initiated:0.2,review_page_viewed:0.5,proof_submitted:1.0,
   binding_task_selected:0.2,sharing_task_selected:0.2,follow_task_selected:0.2,
-  ai_chat_page_viewed:0.3,image_generation_requested:0.5,image_generation_confirmed:0.2,generated_image_viewed:1.2,
+  support_page_viewed:2.0,ticket_submitted:5.0,faq_card_clicked:1.5,faq_search_used:2.5,ticket_list_viewed:1.0,
+  ai_chat_page_viewed:0.3,image_generation_requested:0.5,image_generation_confirmed:0.2,
   use_30pts_unlock_selected:0.1,earn_pts_via_tasks_selected:0.1,
-  support_entry_viewed:2.0,ticket_submitted:5.0,faq_card_clicked:1.5,faq_search_used:2.5,ticket_list_viewed:1.0,
+  other_settings_page_viewed:0.3,connection_safeguard_mode_clicked:0.1,application_mode_page_viewed:0.3,manage_excluded_apps_clicked:0.5,
+  stable_mode_clicked:0.05,use_local_dns_clicked:0.05,manage_excluded_website_clicked:0.5,ad_block_clicked:0.05,tun2proxy_toggle_clicked:0.05,
 };
  
 const DEFAULT_DESCRIPTIONS={
+  // Registration
   account_created:"A new user account was successfully created.",
-  referral_code_entered:"User entered a referral code during registration.",
-  onboarding_started:"User began the onboarding flow for the first time.",
-  first_page_viewed:"User viewed the first page after account creation.",
+  onboarding_page_viewed:"User viewed the onboarding page after account creation.",
+  onboarding_page_skipped:"User skipped the onboarding flow.",
+  home_page_viewed:"User viewed the home page for the first time.",
   email_binded:"User linked an email address to their account.",
+  referral_code_entered:"User entered a referral code during registration.",
+  // Nodes
   server_list_viewed:"User opened the list of available VPN servers.",
   node_selected:"User selected a specific VPN node to connect to.",
   node_connected:"VPN tunnel was established successfully. Fires immediately when the connection handshake completes.",
-  node_connection_failed:"VPN connection attempt failed due to timeout, auth error, or server unavailability.",
   vpn_session_1min:"User maintained an active VPN session for over 1 minute.",
   vpn_session_10min:"User maintained an active VPN session for over 10 minutes.",
   disconnect_clicked:"User clicked the disconnect button to end their VPN session.",
   connect_node_clicked:"User clicked to initiate a connection to a VPN node.",
-  smart_mode_opened:"User opened the Smart Mode configuration panel.",
+  node_connection_failed:"VPN connection attempt failed due to timeout, auth error, or server unavailability.",
+  smart_mode_opened:"User opened the Smart Mode configuration panel. Only tracked when node is connected successfully.",
   feedback_submitted:"User submitted feedback after a VPN session.",
+  latency_test_clicked:"User clicked to run a latency test on a VPN node.",
+  // Referral
   referral_entry_seen:"User saw the referral entry point in the app.",
   referral_link_shared:"User shared their unique referral link.",
   referral_poster_shared:"User shared a referral poster via social or messaging.",
+  // Monetisation
   paywall_viewed:"User was shown the subscription paywall screen.",
   plan_selected:"User selected a subscription plan on the paywall.",
-  payment_method_viewed:"User viewed the available payment method options.",
-  payment_initiated:"User started the payment process.",
+  wechat_pay_selected:"User selected WeChat Pay as their payment method.",
+  payment_detail_page_viewed:"User viewed the payment detail page before completing purchase.",
   payment_completed:"User successfully completed a payment.",
+  alipay_selected:"User selected Alipay as their payment method.",
+  crypto_pay_selected:"User selected cryptocurrency as their payment method.",
   plan_expired_toast_clicked:"User clicked the plan expired toast notification to renew.",
+  payment_detail_page_blocked:"Payment detail page was blocked, preventing the user from completing payment.",
+  // Tasks
   task_centre_opened:"User opened the Task Centre to view available tasks.",
   comment_task_selected:"User selected a comment-type task to complete.",
-  task_completed:"User completed a task in the Task Centre.",
+  task_initiated:"User initiated a task after selecting it.",
+  review_page_viewed:"User viewed the review/store page as part of a task.",
   proof_submitted:"User submitted proof of task completion.",
-  binding_task_selected:"User selected a binding-type task (e.g. link account).",
+  binding_task_selected:"User selected an email binding task.",
   sharing_task_selected:"User selected a sharing-type task.",
   follow_task_selected:"User selected a follow-type task (e.g. follow on social media).",
-  ai_chat_page_viewed:"User navigated to the AI Chat / Image Generation page.",
-  image_generation_requested:"User submitted a prompt to generate an image.",
-  image_generation_confirmed:"User confirmed the image generation action.",
-  generated_image_viewed:"User viewed the generated image result.",
-  use_30pts_unlock_selected:"User chose to spend 30 points to unlock an image.",
-  earn_pts_via_tasks_selected:"User chose to earn points by completing tasks.",
-  support_entry_viewed:"User viewed the support entry point in the app.",
+  // Support
+  support_page_viewed:"User viewed the support page.",
   ticket_submitted:"User submitted a support ticket.",
   faq_card_clicked:"User clicked on an FAQ card to read the answer.",
   faq_search_used:"User used the search function within FAQ.",
   ticket_list_viewed:"User viewed their list of submitted support tickets.",
+  // Image Generation
+  ai_chat_page_viewed:"User navigated to the AI Chat / Image Generation page.",
+  image_generation_requested:"User submitted a prompt to generate an image.",
+  image_generation_confirmed:"User selected to confirm the image generation.",
+  use_30pts_unlock_selected:"User chose to spend credit points to unlock an image after free quota is exhausted.",
+  earn_pts_via_tasks_selected:"User chose to earn credit points via tasks when quota is exhausted and points are insufficient.",
+  // Settings
+  other_settings_page_viewed:"User viewed the Other Settings page.",
+  connection_safeguard_mode_clicked:"User clicked to toggle Connection Safeguard Mode.",
+  application_mode_page_viewed:"User viewed the Application Mode settings page.",
+  manage_excluded_apps_clicked:"User clicked to manage apps excluded from the VPN tunnel.",
+  stable_mode_clicked:"User clicked to toggle Stable Mode.",
+  use_local_dns_clicked:"User clicked to toggle Use Local DNS.",
+  manage_excluded_website_clicked:"User clicked to manage websites excluded from the VPN tunnel.",
+  ad_block_clicked:"User clicked to toggle the Ad-Block feature.",
+  tun2proxy_toggle_clicked:"User clicked to toggle the Tun2Proxy setting.",
 };
  
 const BREAK_DEFS={
@@ -926,7 +980,7 @@ function InlineCorrelatedEvents({lang,t,result,steps,onOpenModal}){
  
   const totalUsers=result[0]?result[0].val:1;
   const convertedUsers=result[result.length-1]?result[result.length-1].val:0;
-  const TAG_LIFT_SEED={Registration:1.8,Nodes:2.1,Referral:2.6,Monetisation:3.8,Tasks:2.4,"Image Generation":1.5,Support:1.3};
+  const TAG_LIFT_SEED={Registration:1.8,Nodes:2.1,Referral:2.6,Monetisation:3.8,Tasks:2.4,"Image Generation":1.5,Support:1.3,Settings:1.6};
   const rawConvRate=convertedUsers/totalUsers;
   const MAX_LIFT_SEED=4.0;
   const baseRate=Math.min(rawConvRate, 1/MAX_LIFT_SEED - 0.01);
@@ -2500,14 +2554,64 @@ function EventDefinitionsPage({descriptions,setDescriptions}){
 
   /* ── Sampling state ───────────────────────────────────────────────────── */
   const [samplingRate,setSamplingRate]=useState(10);
+  const [draftRate,setDraftRate]=useState(10);
   const [samplingTipOpen,setSamplingTipOpen]=useState(false);
   const samplingTipRef=useRef();
+  const isDirty=draftRate!==samplingRate;
   useEffect(()=>{
     if(!samplingTipOpen)return;
     const h=e=>{if(samplingTipRef.current&&!samplingTipRef.current.contains(e.target))setSamplingTipOpen(false);};
     document.addEventListener("mousedown",h);
     return()=>document.removeEventListener("mousedown",h);
   },[samplingTipOpen]);
+  /* ──────────────────────────────────────────────────────────────────────── */
+
+  /* ── Unified confirmation ─────────────────────────────────────────────── */
+  const [confirmPending,setConfirmPending]=useState(null);
+  const confirmExecute=()=>{if(confirmPending){confirmPending.onConfirm();setConfirmPending(null);}};
+  const confirmDismiss=()=>{if(confirmPending?.onCancel)confirmPending.onCancel();setConfirmPending(null);};
+
+  const requestToggleGlobal=()=>setConfirmPending({
+    title:globalEnabled?"Turn off event tracking?":"Turn on event tracking?",
+    body:globalEnabled
+      ?"All event logging will stop immediately regardless of category or event settings."
+      :"Event tracking will resume across all enabled categories and events.",
+    warn:globalEnabled,
+    onConfirm:()=>setGlobalEnabled(v=>!v),
+  });
+  const requestToggleCategory=(tag)=>{
+    const cur=categoryEnabled[tag]!==false;
+    setConfirmPending({
+      title:`Turn ${cur?"off":"on"} ${tag}?`,
+      body:cur
+        ?`All events in the "${tag}" category will be suppressed.`
+        :`Events in the "${tag}" category will resume logging.`,
+      warn:cur,
+      onConfirm:()=>toggleCategory(tag),
+    });
+  };
+  const requestToggleEvent=(id)=>{
+    const ev=ALL_EVENTS.find(e=>e.id===id);
+    const cur=eventEnabled[id]!==false;
+    setConfirmPending({
+      title:`Turn ${cur?"off":"on"} event?`,
+      body:cur
+        ?`"${ev?.label||id}" will stop being recorded.`
+        :`"${ev?.label||id}" will resume being recorded.`,
+      warn:false,
+      onConfirm:()=>toggleEvent(id),
+    });
+  };
+  const requestSamplingApply=()=>{
+    setConfirmPending({
+      title:"Change sampling rate?",
+      body:`Changing from ${samplingRate}% to ${draftRate}%. This may cause broken journeys — analyses crossing a rate change date are unreliable.`,
+      warn:true,
+      onConfirm:()=>setSamplingRate(draftRate),
+      onCancel:()=>setDraftRate(samplingRate),
+    });
+    setSamplingTipOpen(false);
+  };
   /* ──────────────────────────────────────────────────────────────────────── */
 
   const typeOpts=[
@@ -2568,7 +2672,7 @@ function EventDefinitionsPage({descriptions,setDescriptions}){
           {/* ── Level 1: Global Toggle ── */}
           <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:7,flexShrink:0}}>
             <span style={{fontSize:11,fontWeight:600,color:C.muted}}>Event Tracking</span>
-            <ToggleSwitch checked={globalEnabled} onChange={()=>setGlobalEnabled(v=>!v)}/>
+            <ToggleSwitch checked={globalEnabled} onChange={requestToggleGlobal}/>
             <span style={{fontSize:11,fontWeight:700,color:globalEnabled?C.accent:C.muted}}>{globalEnabled?"ON":"OFF"}</span>
           </div>
         </div>
@@ -2585,14 +2689,20 @@ function EventDefinitionsPage({descriptions,setDescriptions}){
           {/* ── Sampling Rate ── */}
           <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:6,flexShrink:0}}>
             <span style={{fontSize:11,fontWeight:600,color:C.muted}}>Sampling</span>
-            <div style={{display:"flex",alignItems:"center",border:`1px solid ${C.border2}`,borderRadius:5,background:C.card,overflow:"hidden"}}>
+            <div style={{display:"flex",alignItems:"center",border:`1px solid ${isDirty?C.accent:C.border2}`,borderRadius:5,background:C.card,overflow:"hidden",transition:"border-color 0.15s"}}>
               <input
-                type="number" min={1} max={100} value={samplingRate}
-                onChange={e=>setSamplingRate(Math.min(100,Math.max(1,parseInt(e.target.value)||1)))}
-                style={{width:38,padding:"3px 6px",border:"none",outline:"none",fontSize:11,color:C.text,background:"transparent",textAlign:"right",MozAppearance:"textfield"}}
+                type="number" min={1} max={100} value={draftRate}
+                onChange={e=>setDraftRate(Math.min(100,Math.max(1,parseInt(e.target.value)||1)))}
+                style={{width:38,padding:"3px 6px",border:"none",outline:"none",fontSize:11,color:isDirty?C.accent:C.text,background:"transparent",textAlign:"right",MozAppearance:"textfield"}}
               />
               <span style={{fontSize:11,color:C.muted,paddingRight:7,paddingLeft:1}}>%</span>
             </div>
+            {isDirty&&(
+              <button onClick={requestSamplingApply}
+                style={{padding:"3px 9px",borderRadius:5,border:`1px solid ${C.accent}`,background:C.accent,color:"#fff",fontSize:11,fontWeight:600,cursor:"pointer",flexShrink:0}}>
+                Apply
+              </button>
+            )}
             <div ref={samplingTipRef} style={{position:"relative",display:"flex",alignItems:"center"}}>
               <button
                 onClick={()=>setSamplingTipOpen(v=>!v)}
@@ -2646,7 +2756,7 @@ function EventDefinitionsPage({descriptions,setDescriptions}){
                 <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:12}}>
                   <div style={{cursor:"pointer",fontSize:10,color:C.muted}} onClick={()=>setSortDir(d=>d==="asc"?"desc":"asc")}>Name {sortDir==="asc"?"↑":"↓"}</div>
                   <div style={{display:"flex",alignItems:"center",gap:6}}>
-                    <ToggleSwitch checked={catOn} onChange={()=>toggleCategory(tag)} disabled={catDisabled}/>
+                    <ToggleSwitch checked={catOn} onChange={()=>requestToggleCategory(tag)} disabled={catDisabled}/>
                     <span style={{fontSize:10,fontWeight:600,color:catDisabled?C.muted:catOn?tagColor:C.muted}}>
                       {catOn?"ON":"OFF"}
                     </span>
@@ -2701,7 +2811,7 @@ function EventDefinitionsPage({descriptions,setDescriptions}){
                           LEVEL 3 — Event Toggle
                           ═══════════════════════════════════════════════════ */}
                       <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,height:"100%"}}>
-                        <ToggleSwitch checked={evOn} onChange={()=>toggleEvent(ev.id)} disabled={evDisabled}/>
+                        <ToggleSwitch checked={evOn} onChange={()=>requestToggleEvent(ev.id)} disabled={evDisabled}/>
                         <span style={{fontSize:9,fontWeight:700,color:evDisabled?C.muted:evOn?C.accent:C.muted}}>
                           {evOn?"ON":"OFF"}
                         </span>
@@ -2725,6 +2835,31 @@ function EventDefinitionsPage({descriptions,setDescriptions}){
           );
         })}
       </div>
+
+      {/* ── Unified confirmation modal ── */}
+      {confirmPending&&(
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.25)",zIndex:999,display:"flex",alignItems:"center",justifyContent:"center"}}>
+          <div style={{background:C.card,borderRadius:10,padding:"24px 26px",width:360,boxShadow:"0 8px 32px rgba(0,0,0,0.14)",border:`1px solid ${C.border}`}}>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
+              {confirmPending.warn&&<span style={{fontSize:16}}>⚠️</span>}
+              <span style={{fontSize:14,fontWeight:700,color:C.text}}>{confirmPending.title}</span>
+            </div>
+            <p style={{fontSize:12,color:confirmPending.warn?C.warn:C.text3,lineHeight:1.7,margin:"0 0 20px"}}>
+              {confirmPending.body}
+            </p>
+            <div style={{display:"flex",justifyContent:"flex-end",gap:8}}>
+              <button onClick={confirmDismiss}
+                style={{padding:"7px 16px",borderRadius:6,border:`1px solid ${C.border2}`,background:C.card,fontSize:12,fontWeight:500,color:C.text3,cursor:"pointer"}}>
+                Cancel
+              </button>
+              <button onClick={confirmExecute}
+                style={{padding:"7px 18px",borderRadius:6,border:"none",background:C.accent,color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer"}}>
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
