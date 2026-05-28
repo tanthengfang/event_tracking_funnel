@@ -305,6 +305,7 @@ const ALL_EVENTS = [
   {id:"manage_excluded_website_clicked",label:"Manage Excluded Website Clicked",labelZh:"点击管理排除网站",tag:"Settings",type:"custom"},
   {id:"ad_block_clicked",label:"Ad-Block Clicked",labelZh:"点击广告拦截",tag:"Settings",type:"custom"},
   {id:"tun2proxy_toggle_clicked",label:"Tun2Proxy Toggle Clicked",labelZh:"点击Tun2Proxy开关",tag:"Settings",type:"custom"},
+  {id:"bypass_vpn_toggle_clicked",label:"Bypass VPN Toggle Clicked",labelZh:"点击VPN绕过开关",tag:"Settings",type:"custom"},
 ];
  
 const TYPE_COLORS={pageview:"#0f766e",custom:"#7c3aed"};
@@ -340,7 +341,7 @@ const BUILT_IN_PRESETS={
     others:["use_30pts_unlock_selected","earn_pts_via_tasks_selected"]},
   settings:{label:"Settings",labelZh:"设置",builtIn:true,
     steps:["other_settings_page_viewed","connection_safeguard_mode_clicked"],
-    others:["application_mode_page_viewed","manage_excluded_apps_clicked","stable_mode_clicked","use_local_dns_clicked","manage_excluded_website_clicked","ad_block_clicked","tun2proxy_toggle_clicked"]},
+    others:["application_mode_page_viewed","manage_excluded_apps_clicked","stable_mode_clicked","use_local_dns_clicked","manage_excluded_website_clicked","ad_block_clicked","tun2proxy_toggle_clicked","bypass_vpn_toggle_clicked"]},
 };
  
 const BASE_COUNTS={
@@ -356,7 +357,7 @@ const BASE_COUNTS={
   ai_chat_page_viewed:6400,image_generation_requested:4200,image_generation_confirmed:3100,
   use_30pts_unlock_selected:1200,earn_pts_via_tasks_selected:980,
   other_settings_page_viewed:4200,connection_safeguard_mode_clicked:1800,application_mode_page_viewed:3100,manage_excluded_apps_clicked:1400,
-  stable_mode_clicked:2200,use_local_dns_clicked:1600,manage_excluded_website_clicked:900,ad_block_clicked:3400,tun2proxy_toggle_clicked:1100,
+  stable_mode_clicked:2200,use_local_dns_clicked:1600,manage_excluded_website_clicked:900,ad_block_clicked:3400,tun2proxy_toggle_clicked:1100,bypass_vpn_toggle_clicked:1300,
 };
  
 const AVG_TIME={
@@ -372,7 +373,7 @@ const AVG_TIME={
   ai_chat_page_viewed:0.3,image_generation_requested:0.5,image_generation_confirmed:0.2,
   use_30pts_unlock_selected:0.1,earn_pts_via_tasks_selected:0.1,
   other_settings_page_viewed:0.3,connection_safeguard_mode_clicked:0.1,application_mode_page_viewed:0.3,manage_excluded_apps_clicked:0.5,
-  stable_mode_clicked:0.05,use_local_dns_clicked:0.05,manage_excluded_website_clicked:0.5,ad_block_clicked:0.05,tun2proxy_toggle_clicked:0.05,
+  stable_mode_clicked:0.05,use_local_dns_clicked:0.05,manage_excluded_website_clicked:0.5,ad_block_clicked:0.05,tun2proxy_toggle_clicked:0.05,bypass_vpn_toggle_clicked:0.05,
 };
  
 const DEFAULT_DESCRIPTIONS={
@@ -440,6 +441,7 @@ const DEFAULT_DESCRIPTIONS={
   manage_excluded_website_clicked:"User clicked to manage websites excluded from the VPN tunnel.",
   ad_block_clicked:"User clicked to toggle the Ad-Block feature.",
   tun2proxy_toggle_clicked:"User clicked to toggle the Tun2Proxy setting.",
+  bypass_vpn_toggle_clicked:"User clicked to toggle the Bypass VPN setting.",
 };
  
 const BREAK_DEFS={
@@ -2989,7 +2991,7 @@ function TrendsPage({lang,dateRange}){
     {id:"s1",eventId:"node_connected",color:genSeriesColor(0)},
     {id:"s2",eventId:"node_connection_failed",color:genSeriesColor(1)},
     {id:"s3",eventId:"payment_completed",color:genSeriesColor(2)},
-    {id:"s4",eventId:"payment_initiated",color:genSeriesColor(3)},
+    {id:"s4",eventId:"payment_detail_page_blocked",color:genSeriesColor(3)},
   ]);
   const [addOpen,setAddOpen]=useState(false);
   const [addSearch,setAddSearch]=useState("");
