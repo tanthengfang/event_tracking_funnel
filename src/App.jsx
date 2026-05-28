@@ -171,6 +171,7 @@ const useT = () => {
     byV2SearchAlgo:l==="zh"?"按 v2-search-algo":"By v2-search-algo",
     byCheckoutFlowTest:l==="zh"?"按 checkout-flow-test":"By checkout-flow-test",
     byCnyFestivalUi:l==="zh"?"按 cny-festival-ui":"By cny-festival-ui",
+    byAcquisitionSource:l==="zh"?"按获客来源":"By Acquisition Source",
     presetFunnels:l==="zh"?"预设漏斗":"Preset Funnels",
     loading:l==="zh"?"加载中…":"Loading…",
     saveCurrentAsPreset:l==="zh"?"+ 保存为预设":"+ Save as Preset",
@@ -194,7 +195,7 @@ const useT = () => {
     deletePresetTitle:l==="zh"?"删除预设？":"Delete preset?",
     deleteBtn:l==="zh"?"删除":"Delete",
     searchSteps:l==="zh"?"搜索步骤…":"Search steps…",
-    breakdownLabel:{device:l==="zh"?"设备":"Device",status:l==="zh"?"状态":"Status",region:l==="zh"?"地区":"Region",v2_search_algo:l==="zh"?"v2-search-algo":"v2-search-algo",checkout_flow_test:l==="zh"?"checkout-flow-test":"checkout-flow-test",cny_festival_ui:l==="zh"?"cny-festival-ui":"cny-festival-ui"},
+    breakdownLabel:{device:l==="zh"?"设备":"Device",status:l==="zh"?"状态":"Status",region:l==="zh"?"地区":"Region",v2_search_algo:l==="zh"?"v2-search-algo":"v2-search-algo",checkout_flow_test:l==="zh"?"checkout-flow-test":"checkout-flow-test",cny_festival_ui:l==="zh"?"cny-festival-ui":"cny-festival-ui",acquisition_source:l==="zh"?"获客来源":"Acquisition Source"},
     stepsCount:(n)=>l==="zh"?`${n} 个步骤 · 拖动排序`:`${n} steps · drag to reorder`,
     stepsCollapsed:(n)=>l==="zh"?`${n} 个步骤（已折叠）`:`${n} steps (collapsed)`,
     deleteConfirmText:(n)=>l==="zh"?`"${n}" 将被永久删除`:`"${n}" will be permanently removed.`,
@@ -452,6 +453,7 @@ const BREAK_DEFS={
   v2_search_algo:[{key:"v2_search_algo_true",label:"v2-search-algo: true",labelZh:"v2-search-algo：开启",mult:0.52},{key:"v2_search_algo_false",label:"v2-search-algo: false",labelZh:"v2-search-algo：关闭",mult:0.48}],
   checkout_flow_test:[{key:"checkout_flow_test_control",label:"checkout-flow-test: control",labelZh:"checkout-flow-test：control",mult:0.35},{key:"checkout_flow_test_one_page",label:"checkout-flow-test: one_page",labelZh:"checkout-flow-test：one_page",mult:0.40},{key:"checkout_flow_test_step_wizard",label:"checkout-flow-test: step_wizard",labelZh:"checkout-flow-test：step_wizard",mult:0.25}],
   cny_festival_ui:[{key:"cny_festival_ui_true",label:"cny-festival-ui: true",labelZh:"cny-festival-ui：开启",mult:0.60},{key:"cny_festival_ui_false",label:"cny-festival-ui: false",labelZh:"cny-festival-ui：关闭",mult:0.40}],
+  acquisition_source:[{key:"acq_website",label:"Website",labelZh:"官网",mult:0.45},{key:"acq_seo",label:"SEO",labelZh:"SEO",mult:0.35},{key:"acq_insta",label:"Insta Ads",labelZh:"Instagram广告",mult:0.20}],
 };
 const BASELINE={key:"all",label:"Baseline",labelZh:"基准线",mult:1};
 const SEG_CURVES={
@@ -1147,7 +1149,7 @@ const PROP_ENUM_VALUES={
   device_type:["Android","MacOS","iOS","Linux","Windows"],
   user_role:["Free","Base","VIP","SVIP"],
   provinces:["Anhui","Fujian","Gansu","Guangdong","Guizhou","Hainan","Hebei","Heilongjiang","Henan","Hubei","Hunan","Jiangsu","Jiangxi","Jilin","Liaoning","Qinghai","Shaanxi","Shandong","Shanxi","Sichuan","Yunnan","Zhejiang","Taiwan"],
-  acquisition_source:["Organic","Referral","Agent"],
+  acquisition_source:["Website","SEO","Insta Ads"],
   user_type:["Agent","Customer"],
 };
 
@@ -1702,6 +1704,7 @@ function FunnelPage({panelOpen,setPanel,setTab,descriptions,setDescriptions,setF
     {value:"none",label:t.noBreakdown,category:"all"},
     {value:"device",label:t.byDevice,category:"person"},
     {value:"status",label:t.byStatus,category:"person"},
+    {value:"acquisition_source",label:t.byAcquisitionSource,category:"person"},
     {value:"v2_search_algo",label:t.byV2SearchAlgo,category:"feature"},
     {value:"checkout_flow_test",label:t.byCheckoutFlowTest,category:"feature"},
     {value:"cny_festival_ui",label:t.byCnyFestivalUi,category:"feature"},
@@ -2879,7 +2882,7 @@ const ALL_PROPERTIES=[
   {key:"user_role",label:"User Role",type:"Array",desc:"Free, Base, VIP, SVIP."},
   {key:"provinces",label:"Provinces (China)",type:"Array",desc:"Anhui, Fujian, Gansu, Guangdong, Guizhou, Hainan, Hebei, Heilongjiang, Henan, Hubei, Hunan, Jiangsu, Jiangxi, Jilin, Liaoning, Qinghai, Shaanxi, Shandong, Shanxi, Sichuan, Yunnan, Zhejiang, Taiwan."},
   {key:"referree_count",label:"Referree Count",type:"Numeric",desc:"Number of direct referees (tier 1 fanclub)."},
-  {key:"acquisition_source",label:"Acquisition Source",type:"Array",desc:"Organic, Referral, Agent."},
+  {key:"acquisition_source",label:"Acquisition Source",type:"Array",desc:"The channel that acquired the user. Can be broken down into: Website, SEO, Insta Ads."},
   {key:"user_type",label:"User Type",type:"Array",desc:"Agent, Customer."},
 ];
 
@@ -3041,6 +3044,7 @@ function TrendsPage({lang,dateRange}){
     {value:"none",label:"No breakdown",category:"all"},
     {value:"device",label:"By Device",category:"person"},
     {value:"status",label:"By User Role",category:"person"},
+    {value:"acquisition_source",label:"By Acquisition Source",category:"person"},
     {value:"v2_search_algo",label:"By v2-search-algo",category:"feature"},
     {value:"checkout_flow_test",label:"By checkout-flow-test",category:"feature"},
     {value:"cny_festival_ui",label:"By cny-festival-ui",category:"feature"},
