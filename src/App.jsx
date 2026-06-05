@@ -2571,6 +2571,19 @@ function EventDefinitionsPage({descriptions,setDescriptions}){
   },[samplingTipOpen]);
   /* ──────────────────────────────────────────────────────────────────────── */
 
+  /* ── Pipeline config state ────────────────────────────────────────────── */
+  const [batchSize,setBatchSize]=useState(100);
+  const [draftBatch,setDraftBatch]=useState(100);
+  const isDirtyBatch=draftBatch!==batchSize;
+  const [intervalVal,setIntervalVal]=useState(10);
+  const [draftInterval,setDraftInterval]=useState(10);
+  const [intervalUnit,setIntervalUnit]=useState("Minutes");
+  const [draftIntervalUnit,setDraftIntervalUnit]=useState("Minutes");
+  const isDirtyInterval=draftInterval!==intervalVal||draftIntervalUnit!==intervalUnit;
+  const [urgentState,setUrgentState]=useState("idle"); /* "idle"|"loading"|"done" */
+  const [urgentTip,setUrgentTip]=useState(false);
+  /* ──────────────────────────────────────────────────────────────────────── */
+
   /* ── Unified confirmation ─────────────────────────────────────────────── */
   const [confirmPending,setConfirmPending]=useState(null);
   const confirmExecute=()=>{if(confirmPending){confirmPending.onConfirm();setConfirmPending(null);}};
@@ -2617,6 +2630,29 @@ function EventDefinitionsPage({descriptions,setDescriptions}){
     });
     setSamplingTipOpen(false);
   };
+  const requestBatchApply=()=>setConfirmPending({
+    title:"Change batch size?",
+    body:`Changing batch size from ${batchSize} to ${draftBatch} events. The pipeline will auto-deliver once this many events are queued.`,
+    warn:false,
+    onConfirm:()=>setBatchSize(draftBatch),
+    onCancel:()=>setDraftBatch(batchSize),
+  });
+  const requestIntervalApply=()=>setConfirmPending({
+    title:"Change delivery interval?",
+    body:`Changing interval from ${intervalVal} ${intervalUnit} to ${draftInterval} ${draftIntervalUnit}. Queued events will be held for up to this duration before auto-delivery.`,
+    warn:false,
+    onConfirm:()=>{setIntervalVal(draftInterval);setIntervalUnit(draftIntervalUnit);},
+    onCancel:()=>{setDraftInterval(intervalVal);setDraftIntervalUnit(intervalUnit);},
+  });
+  const requestUrgentSend=()=>setConfirmPending({
+    title:"Urgent send?",
+    body:"All queued events will be immediately flushed to the analytics pipeline. Use only for debugging or incident investigation.",
+    warn:true,
+    onConfirm:()=>{
+      setUrgentState("loading");
+      setTimeout(()=>{setUrgentState("done");setTimeout(()=>setUrgentState("idle"),2200);},1400);
+    },
+  });
   /* ──────────────────────────────────────────────────────────────────────── */
 
   const typeOpts=[
@@ -2728,6 +2764,85 @@ function EventDefinitionsPage({descriptions,setDescriptions}){
             </div>
           </div>
         </div>
+
+        {/* ── Pipeline Configuration row ─────────────────────────────────── */}
+        <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap",paddingTop:2}}>
+          <span style={{fontSize:11,fontWeight:600,color:C.muted,flexShrink:0}}>Pipeline</span>
+
+          {/* Batch Size */}
+          <div style={{display:"flex",alignItems:"center",gap:5}}>
+            <span style={{fontSize:11,color:C.muted,flexShrink:0}}>Batch Size</span>
+            <div style={{display:"flex",alignItems:"center",border:`1px solid ${isDirtyBatch?C.accent:C.border2}`,borderRadius:5,background:C.card,overflow:"hidden",transition:"border-color 0.15s"}}>
+              <input
+                type="number" min={1} value={draftBatch}
+                onChange={e=>setDraftBatch(Math.max(1,parseInt(e.target.value)||1))}
+                style={{width:52,padding:"3px 6px",border:"none",outline:"none",fontSize:11,color:isDirtyBatch?C.accent:C.text,background:"transparent",textAlign:"right",MozAppearance:"textfield"}}
+              />
+              <span style={{fontSize:11,color:C.muted,paddingRight:7,paddingLeft:1}}>events</span>
+            </div>
+            {isDirtyBatch&&(
+              <button onClick={requestBatchApply}
+                style={{padding:"3px 9px",borderRadius:5,border:`1px solid ${C.accent}`,background:C.accent,color:"#fff",fontSize:11,fontWeight:600,cursor:"pointer",flexShrink:0}}>
+                Apply
+              </button>
+            )}
+          </div>
+
+          {/* Interval */}
+          <div style={{display:"flex",alignItems:"center",gap:5}}>
+            <span style={{fontSize:11,color:C.muted,flexShrink:0}}>Interval</span>
+            <div style={{display:"flex",alignItems:"center",border:`1px solid ${isDirtyInterval?C.accent:C.border2}`,borderRadius:5,background:C.card,overflow:"hidden",transition:"border-color 0.15s"}}>
+              <input
+                type="number" min={1} value={draftInterval}
+                onChange={e=>setDraftInterval(Math.max(1,parseInt(e.target.value)||1))}
+                style={{width:38,padding:"3px 6px",border:"none",outline:"none",fontSize:11,color:isDirtyInterval?C.accent:C.text,background:"transparent",textAlign:"right",MozAppearance:"textfield"}}
+              />
+              <select
+                value={draftIntervalUnit}
+                onChange={e=>setDraftIntervalUnit(e.target.value)}
+                style={{border:"none",borderLeft:`1px solid ${isDirtyInterval?C.accent+"40":C.border}`,outline:"none",fontSize:11,color:isDirtyInterval?C.accent:C.muted,background:"transparent",padding:"3px 6px 3px 5px",cursor:"pointer",appearance:"auto"}}>
+                <option>Seconds</option>
+                <option>Minutes</option>
+                <option>Hours</option>
+              </select>
+            </div>
+            {isDirtyInterval&&(
+              <button onClick={requestIntervalApply}
+                style={{padding:"3px 9px",borderRadius:5,border:`1px solid ${C.accent}`,background:C.accent,color:"#fff",fontSize:11,fontWeight:600,cursor:"pointer",flexShrink:0}}>
+                Apply
+              </button>
+            )}
+          </div>
+
+          {/* Urgent Send */}
+          <div style={{marginLeft:"auto",position:"relative",flexShrink:0}}
+            onMouseEnter={()=>setUrgentTip(true)}
+            onMouseLeave={()=>setUrgentTip(false)}>
+            <button
+              onClick={urgentState==="idle"?requestUrgentSend:undefined}
+              disabled={urgentState==="loading"}
+              style={{
+                padding:"4px 12px",borderRadius:5,fontSize:11,fontWeight:700,cursor:urgentState==="loading"?"wait":urgentState==="done"?"default":"pointer",
+                border:`1px solid ${urgentState==="done"?"#16a34a":urgentState==="loading"?C.border2:"#dc2626"}`,
+                background:urgentState==="done"?"#f0fdf4":urgentState==="loading"?C.bg:"#fef2f2",
+                color:urgentState==="done"?"#16a34a":urgentState==="loading"?C.muted:"#dc2626",
+                opacity:urgentState==="loading"?0.7:1,
+                transition:"all 0.2s",
+                display:"flex",alignItems:"center",gap:5,
+              }}>
+              {urgentState==="loading"&&(
+                <span style={{display:"inline-block",width:10,height:10,borderRadius:"50%",border:"2px solid #d1d5db",borderTopColor:C.muted,animation:"spin 0.7s linear infinite"}}/>
+              )}
+              {urgentState==="done"?"✓ Sent":urgentState==="loading"?"Sending…":"⚡ Urgent Send"}
+            </button>
+            {urgentTip&&urgentState==="idle"&&(
+              <div style={{position:"absolute",bottom:"calc(100% + 6px)",right:0,zIndex:600,width:250,background:"#1e293b",color:"#f8fafc",borderRadius:6,padding:"8px 11px",fontSize:11,lineHeight:1.6,boxShadow:"0 4px 14px rgba(0,0,0,0.18)",pointerEvents:"none"}}>
+                Immediately sends all queued events. Use for debugging or incident investigation only.
+              </div>
+            )}
+          </div>
+        </div>
+        {/* ──────────────────────────────────────────────────────────────────── */}
       </div>
 
       <div style={{display:"flex",flexDirection:"column",gap:12}}>
