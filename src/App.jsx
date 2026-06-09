@@ -2587,7 +2587,20 @@ function EventDefinitionsPage({descriptions,setDescriptions}){
   const [draftIntervalUnit,setDraftIntervalUnit]=useState("Minutes");
   const isDirtyInterval=draftInterval!==intervalVal||draftIntervalUnit!==intervalUnit;
   const [urgentState,setUrgentState]=useState("idle"); /* "idle"|"loading"|"done" */
-  const [urgentTip,setUrgentTip]=useState(false);
+  const [urgentSendPerEvent,setUrgentSendPerEvent]=useState(()=>{
+    const s={};ALL_EVENTS.forEach(ev=>{s[ev.id]=false;});return s;
+  });
+  const [urgentSendCategoryEnabled,setUrgentSendCategoryEnabled]=useState(()=>{
+    const s={};Object.keys(TAG_COLORS).forEach(tag=>{s[tag]=false;});return s;
+  });
+  const [openActionMenu,setOpenActionMenu]=useState(null);
+  const actionMenuRefs=useRef({});
+  useEffect(()=>{
+    if(!openActionMenu)return;
+    const h=e=>{const el=actionMenuRefs.current[openActionMenu];if(el&&!el.contains(e.target))setOpenActionMenu(null);};
+    document.addEventListener("mousedown",h);
+    return()=>document.removeEventListener("mousedown",h);
+  },[openActionMenu]);
   /* ──────────────────────────────────────────────────────────────────────── */
 
   /* ── Unified confirmation ─────────────────────────────────────────────── */
@@ -2659,6 +2672,37 @@ function EventDefinitionsPage({descriptions,setDescriptions}){
       setTimeout(()=>{setUrgentState("done");setTimeout(()=>setUrgentState("idle"),2200);},1400);
     },
   });
+  const requestToggleUrgentSendForCategory=(tag)=>{
+    const cur=urgentSendCategoryEnabled[tag]!==false;
+    const categoryEventIds=ALL_EVENTS.filter(e=>e.tag===tag).map(e=>e.id);
+    setConfirmPending({
+      title:cur?"Disable Urgent Send for category?":"Enable Urgent Send for category?",
+      body:cur
+        ?`Urgent Send will be turned off for "${tag}".`
+        :`Urgent Send will be turned on for "${tag}" and all ${categoryEventIds.length} events in it.`,
+      warn:cur,
+      onConfirm:()=>{
+        setUrgentSendCategoryEnabled(p=>({...p,[tag]:!cur}));
+        setUrgentSendPerEvent(p=>{
+          const next={...p};
+          categoryEventIds.forEach(id=>{next[id]=!cur;});
+          return next;
+        });
+      },
+    });
+  };
+  const requestToggleUrgentSendForEvent=(id)=>{
+    const ev=ALL_EVENTS.find(e=>e.id===id);
+    const cur=urgentSendPerEvent[id]!==false;
+    setConfirmPending({
+      title:cur?"Disable Urgent Send for this event?":"Enable Urgent Send for this event?",
+      body:cur
+        ?`Urgent Send will be turned off for "${ev?.label||id}".`
+        :`Urgent Send will be turned on for "${ev?.label||id}".`,
+      warn:cur,
+      onConfirm:()=>setUrgentSendPerEvent(p=>({...p,[id]:!cur})),
+    });
+  };
   /* ──────────────────────────────────────────────────────────────────────── */
 
   const typeOpts=[
@@ -2820,33 +2864,6 @@ function EventDefinitionsPage({descriptions,setDescriptions}){
             )}
           </div>
 
-          {/* Urgent Send */}
-          <div style={{marginLeft:"auto",position:"relative",flexShrink:0}}
-            onMouseEnter={()=>setUrgentTip(true)}
-            onMouseLeave={()=>setUrgentTip(false)}>
-            <button
-              onClick={urgentState==="idle"?requestUrgentSend:undefined}
-              disabled={urgentState==="loading"}
-              style={{
-                padding:"4px 12px",borderRadius:5,fontSize:11,fontWeight:700,cursor:urgentState==="loading"?"wait":urgentState==="done"?"default":"pointer",
-                border:`1px solid ${urgentState==="done"?"#16a34a":urgentState==="loading"?C.border2:"#dc2626"}`,
-                background:urgentState==="done"?"#f0fdf4":urgentState==="loading"?C.bg:"#fef2f2",
-                color:urgentState==="done"?"#16a34a":urgentState==="loading"?C.muted:"#dc2626",
-                opacity:urgentState==="loading"?0.7:1,
-                transition:"all 0.2s",
-                display:"flex",alignItems:"center",gap:5,
-              }}>
-              {urgentState==="loading"&&(
-                <span style={{display:"inline-block",width:10,height:10,borderRadius:"50%",border:"2px solid #d1d5db",borderTopColor:C.muted,animation:"spin 0.7s linear infinite"}}/>
-              )}
-              {urgentState==="done"?"✓ Sent":urgentState==="loading"?"Sending…":"⚡ Urgent Send"}
-            </button>
-            {urgentTip&&urgentState==="idle"&&(
-              <div style={{position:"absolute",bottom:"calc(100% + 6px)",right:0,zIndex:600,width:250,background:"#1e293b",color:"#f8fafc",borderRadius:6,padding:"8px 11px",fontSize:11,lineHeight:1.6,boxShadow:"0 4px 14px rgba(0,0,0,0.18)",pointerEvents:"none"}}>
-                Immediately sends all queued events. Use for debugging or incident investigation only.
-              </div>
-            )}
-          </div>
         </div>
         {/* ──────────────────────────────────────────────────────────────────── */}
       </div>
@@ -2860,6 +2877,7 @@ function EventDefinitionsPage({descriptions,setDescriptions}){
           const catOn=categoryEnabled[tag]!==false;
           const catDisabled=!globalEnabled;           /* greyed when L1 is off */
           const catEffectiveOn=globalEnabled&&catOn;  /* truly active */
+          const catUrgentOn=urgentSendCategoryEnabled[tag]!==false;
           return (
             <div key={tag} style={{
               background:C.card,borderRadius:8,overflow:"hidden",
@@ -2881,6 +2899,13 @@ function EventDefinitionsPage({descriptions,setDescriptions}){
                 <span style={{fontSize:10,color:catEffectiveOn?tagColor:C.muted,opacity:0.7}}>{evs.length} event{evs.length!==1?"s":""}</span>
                 <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:12}}>
                   <div style={{cursor:"pointer",fontSize:10,color:C.muted}} onClick={()=>setSortDir(d=>d==="asc"?"desc":"asc")}>Name {sortDir==="asc"?"↑":"↓"}</div>
+                  {/* Urgent Send category toggle */}
+                  <div style={{display:"flex",alignItems:"center",gap:5,paddingRight:12,borderRight:`1px solid ${C.border}`}}>
+                    <span style={{fontSize:10,fontWeight:600,color:catUrgentOn?"#dc2626":C.muted}}>Urgent Send</span>
+                    <ToggleSwitch checked={catUrgentOn} onChange={()=>requestToggleUrgentSendForCategory(tag)}/>
+                    <span style={{fontSize:10,fontWeight:600,color:catUrgentOn?"#dc2626":C.muted}}>{catUrgentOn?"ON":"OFF"}</span>
+                  </div>
+                  {/* Event tracking toggle */}
                   <div style={{display:"flex",alignItems:"center",gap:6}}>
                     <ToggleSwitch checked={catOn} onChange={()=>requestToggleCategory(tag)} disabled={catDisabled}/>
                     <span style={{fontSize:10,fontWeight:600,color:catDisabled?C.muted:catOn?tagColor:C.muted}}>
@@ -2901,6 +2926,7 @@ function EventDefinitionsPage({descriptions,setDescriptions}){
                 const evOn=eventEnabled[ev.id]!==false;
                 const evDisabled=!globalEnabled||!catOn;   /* greyed when L1 or L2 is off */
                 const evEffectiveOn=globalEnabled&&catOn&&evOn;
+                const evUrgentArmed=catUrgentOn&&urgentSendPerEvent[ev.id]!==false;
                 return (
                   <div key={ev.id} style={{
                     borderBottom:isLast?"none":`1px solid ${C.border}`,
@@ -2943,14 +2969,44 @@ function EventDefinitionsPage({descriptions,setDescriptions}){
                         </span>
                       </div>
                       {/* ═══════════════════════════════════════════════════ */}
-                      <div>
+                      <div style={{position:"relative"}} ref={el=>actionMenuRefs.current[ev.id]=el}>
                         {!isEditing&&(
-                          <button onClick={()=>startEdit(ev.id)}
-                            style={{display:"flex",alignItems:"center",gap:5,padding:"5px 11px",borderRadius:6,border:`1px solid ${C.border2}`,background:C.card,color:C.text3,fontSize:11,fontWeight:500,cursor:"pointer"}}
-                            onMouseEnter={e=>{e.currentTarget.style.borderColor=C.accent;e.currentTarget.style.color=C.accent;}}
-                            onMouseLeave={e=>{e.currentTarget.style.borderColor=C.border2;e.currentTarget.style.color=C.text3;}}>
-                            ✏️ Edit
-                          </button>
+                          <>
+                            <button
+                              onClick={()=>setOpenActionMenu(v=>v===ev.id?null:ev.id)}
+                              style={{display:"flex",alignItems:"center",gap:4,padding:"5px 10px",borderRadius:6,border:`1px solid ${openActionMenu===ev.id?C.accent:C.border2}`,background:openActionMenu===ev.id?C.accentBg:C.card,color:openActionMenu===ev.id?C.accent:C.text3,fontSize:11,fontWeight:500,cursor:"pointer",transition:"all 0.12s"}}>
+                              Actions
+                              <span style={{fontSize:9,display:"inline-block",transform:openActionMenu===ev.id?"rotate(180deg)":"rotate(0deg)",transition:"transform 0.12s"}}>▼</span>
+                            </button>
+                            {openActionMenu===ev.id&&(
+                              <div style={{position:"absolute",right:0,top:"calc(100% + 4px)",zIndex:300,minWidth:148,background:C.card,border:`1px solid ${C.border2}`,borderRadius:7,boxShadow:"0 4px 14px rgba(0,0,0,0.10)",overflow:"hidden"}}>
+                                <div
+                                  onClick={()=>{startEdit(ev.id);setOpenActionMenu(null);}}
+                                  style={{display:"flex",alignItems:"center",gap:7,padding:"9px 13px",fontSize:11,color:C.text3,cursor:"pointer",borderBottom:`1px solid ${C.border}`}}
+                                  onMouseEnter={e=>{e.currentTarget.style.background=C.accentBg;e.currentTarget.style.color=C.accent;}}
+                                  onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=C.text3;}}>
+                                  <span>Edit Description</span>
+                                </div>
+                                <div style={{display:"flex",alignItems:"center",padding:"9px 13px",gap:6,borderTop:`1px solid ${C.border}`}}>
+                                  {/* Action — always clickable when idle; armed state only affects colour */}
+                                  <div
+                                    onClick={()=>{if(urgentState==="idle"){requestUrgentSend();setOpenActionMenu(null);}}}
+                                    style={{display:"flex",alignItems:"center",gap:7,flex:1,fontSize:11,color:evUrgentArmed?"#dc2626":C.muted,cursor:urgentState==="idle"?"pointer":"default",transition:"color 0.15s"}}
+                                    onMouseEnter={e=>{if(urgentState==="idle")e.currentTarget.style.opacity="0.7";}}
+                                    onMouseLeave={e=>{e.currentTarget.style.opacity="1";}}>
+                                    {urgentState==="loading"&&(
+                                      <span style={{display:"inline-block",width:10,height:10,borderRadius:"50%",border:"2px solid #fca5a5",borderTopColor:"#dc2626",animation:"spin 0.7s linear infinite"}}/>
+                                    )}
+                                    <span>{urgentState==="done"?"✓ Sent":urgentState==="loading"?"Sending…":"Urgent Send"}</span>
+                                  </div>
+                                  {/* Per-event toggle — always interactive */}
+                                  <div onClick={e=>{e.stopPropagation();requestToggleUrgentSendForEvent(ev.id);}}>
+                                    <ToggleSwitch checked={urgentSendPerEvent[ev.id]!==false} onChange={()=>requestToggleUrgentSendForEvent(ev.id)}/>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </>
                         )}
                       </div>
                     </div>
