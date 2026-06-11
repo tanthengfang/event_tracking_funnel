@@ -249,7 +249,9 @@ const ALL_EVENTS = [
   {id:"home_page_viewed",label:"Home Page Viewed",labelZh:"查看首页",tag:"Registration",type:"pageview"},
   {id:"email_binded",label:"Email Account Binded",labelZh:"绑定邮箱账户",tag:"Registration",type:"custom"},
   {id:"referral_code_entered",label:"Referral Code Entered",labelZh:"输入推荐码",tag:"Registration",type:"custom"},
-  {id:"app_crashed_relaunched",label:"App Crashed and Relaunched",labelZh:"应用崩溃并重启",tag:"Registration",type:"custom"},
+  {id:"app_crashed_relaunched",label:"App Crashed and Relaunched",labelZh:"应用崩溃并重启",tag:"Error",type:"error"},
+  {id:"register_failed",label:"Register Failed",labelZh:"注册失败",tag:"Registration",type:"error"},
+  {id:"sign_in_failed",label:"Sign In Failed",labelZh:"登录失败",tag:"Registration",type:"error"},
   // ── Nodes ─────────────────────────────────────────────────────────────────
   {id:"server_list_viewed",label:"Server List Viewed",labelZh:"查看服务器列表",tag:"Nodes",type:"pageview"},
   {id:"node_selected",label:"Node Selected",labelZh:"选择节点",tag:"Nodes",type:"custom"},
@@ -263,6 +265,7 @@ const ALL_EVENTS = [
   {id:"feedback_submitted",label:"Feedback Submitted",labelZh:"提交反馈",tag:"Nodes",type:"custom"},
   {id:"latency_test_clicked",label:"Latency Test Clicked",labelZh:"点击延迟测试",tag:"Nodes",type:"custom"},
   {id:"quota_full",label:"Quota Full",labelZh:"流量已用尽",tag:"Nodes",type:"custom"},
+  {id:"config_failed",label:"Config Failed",labelZh:"配置加载失败",tag:"Nodes",type:"error"},
   // ── Referral ──────────────────────────────────────────────────────────────
   {id:"referral_entry_seen",label:"Referral Entry Viewed",labelZh:"查看推荐入口",tag:"Referral",type:"pageview"},
   {id:"referral_link_shared",label:"Referral Link Shared",labelZh:"分享推荐链接",tag:"Referral",type:"custom"},
@@ -276,8 +279,9 @@ const ALL_EVENTS = [
   {id:"alipay_selected",label:"Alipay Selected",labelZh:"选择支付宝",tag:"Monetisation",type:"custom"},
   {id:"crypto_pay_selected",label:"Crypto Pay Selected",labelZh:"选择加密货币支付",tag:"Monetisation",type:"custom"},
   {id:"plan_expired_toast_clicked",label:"Plan Expired Toast Clicked",labelZh:"套餐到期提示已点击",tag:"Monetisation",type:"custom"},
-  {id:"payment_detail_page_blocked",label:"Payment Detail Page Blocked",labelZh:"支付详情页被拦截",tag:"Monetisation",type:"custom"},
+  {id:"payment_detail_page_blocked",label:"Payment Detail Page Blocked",labelZh:"支付详情页被拦截",tag:"Monetisation",type:"error"},
   {id:"payment_failed",label:"Payment Failed",labelZh:"支付失败",tag:"Monetisation",type:"custom"},
+  {id:"payment_detail_page_load_failed",label:"Payment Detail Page Load Failed",labelZh:"支付详情页加载失败",tag:"Monetisation",type:"custom"},
   // ── Tasks ─────────────────────────────────────────────────────────────────
   {id:"task_centre_opened",label:"Task Centre Viewed",labelZh:"查看任务中心",tag:"Tasks",type:"pageview"},
   {id:"comment_task_selected",label:"Comment Task Selected",labelZh:"选择评论任务",tag:"Tasks",type:"custom"},
@@ -312,28 +316,29 @@ const ALL_EVENTS = [
   {id:"bypass_vpn_toggle_clicked",label:"Bypass VPN Toggle Clicked",labelZh:"点击VPN绕过开关",tag:"Settings",type:"custom"},
 ];
  
-const TYPE_COLORS={pageview:"#0f766e",custom:"#7c3aed"};
-const TYPE_LABELS={pageview:"Page View",custom:"Custom Event"};
+const TYPE_COLORS={pageview:"#0f766e",custom:"#7c3aed",error:"#dc2626"};
+const TYPE_LABELS={pageview:"Page View",custom:"Action",error:"Error"};
 
 const genSeriesColor=(index)=>{const colors=["#3A3A3A","#5BA3D0","#6BA085","#8FA5C4","#C4A5A8","#A89070","#2F2F2F","#4A90B8","#70A89A","#7FA3D0","#D0A5B0","#9B8B75"];return colors[index%colors.length];};
 const TAG_COLORS={
   Registration:"#5BA3D0",Nodes:"#3A3A3A",Referral:"#6BA085",
   Monetisation:"#A89070",Tasks:"#70A89A","Image Generation":"#8FA5C4",Support:"#C4A5A8",Settings:"#9B7EC8",
+  Error:"#dc2626",
 };
  
 const BUILT_IN_PRESETS={
   registration:{label:"Registration",labelZh:"注册流程",builtIn:true,
     steps:["account_created","onboarding_page_viewed","onboarding_page_skipped","home_page_viewed"],
-    others:["email_binded","referral_code_entered","app_crashed_relaunched"]},
+    others:["email_binded","referral_code_entered","register_failed","sign_in_failed"]},
   nodes:{label:"Node Usage",labelZh:"节点使用",builtIn:true,
     steps:["server_list_viewed","node_selected","node_connected","vpn_session_1min","vpn_session_10min","disconnect_clicked"],
-    others:["connect_node_clicked","node_connection_failed","smart_mode_opened","feedback_submitted","latency_test_clicked","quota_full"]},
+    others:["connect_node_clicked","node_connection_failed","smart_mode_opened","feedback_submitted","latency_test_clicked","quota_full","config_failed"]},
   referral:{label:"Referral",labelZh:"推荐流程",builtIn:true,
     steps:["referral_entry_seen","referral_link_shared"],
     others:["referral_poster_shared"]},
   monetisation:{label:"Monetisation",labelZh:"变现流程",builtIn:true,
     steps:["paywall_viewed","plan_selected","wechat_pay_selected","payment_detail_page_viewed","payment_completed"],
-    others:["alipay_selected","crypto_pay_selected","plan_expired_toast_clicked","payment_detail_page_blocked","payment_failed"]},
+    others:["alipay_selected","crypto_pay_selected","plan_expired_toast_clicked","payment_detail_page_blocked","payment_failed","payment_detail_page_load_failed"]},
   tasks:{label:"Tasks",labelZh:"任务流程",builtIn:true,
     steps:["task_centre_opened","comment_task_selected","task_initiated","review_page_viewed","proof_submitted"],
     others:["binding_task_selected","sharing_task_selected","follow_task_selected"]},
@@ -343,18 +348,21 @@ const BUILT_IN_PRESETS={
   image_generation:{label:"Image Generation",labelZh:"图像生成",builtIn:true,
     steps:["ai_chat_page_viewed","image_generation_requested","image_generation_confirmed"],
     others:["use_30pts_unlock_selected","earn_pts_via_tasks_selected"]},
+  error:{label:"Error",labelZh:"错误",builtIn:true,
+    steps:["app_crashed_relaunched"],
+    others:["register_failed","sign_in_failed","config_failed","payment_detail_page_blocked","payment_detail_page_load_failed","payment_failed"]},
   settings:{label:"Settings",labelZh:"设置",builtIn:true,
     steps:["other_settings_page_viewed","connection_safeguard_mode_clicked"],
     others:["application_mode_page_viewed","manage_excluded_apps_clicked","stable_mode_clicked","use_local_dns_clicked","manage_excluded_website_clicked","ad_block_clicked","tun2proxy_toggle_clicked","bypass_vpn_toggle_clicked"]},
 };
  
 const BASE_COUNTS={
-  account_created:21200,onboarding_page_viewed:20800,onboarding_page_skipped:8400,home_page_viewed:19600,email_binded:9400,referral_code_entered:7820,app_crashed_relaunched:1200,
+  account_created:21200,onboarding_page_viewed:20800,onboarding_page_skipped:8400,home_page_viewed:19600,email_binded:9400,referral_code_entered:7820,app_crashed_relaunched:1200,register_failed:640,sign_in_failed:820,
   server_list_viewed:18600,node_selected:16200,node_connected:14800,vpn_session_1min:10800,vpn_session_10min:8400,disconnect_clicked:7200,
-  connect_node_clicked:14200,node_connection_failed:1800,smart_mode_opened:4200,feedback_submitted:1800,latency_test_clicked:5600,quota_full:3400,
+  connect_node_clicked:14200,node_connection_failed:1800,smart_mode_opened:4200,feedback_submitted:1800,latency_test_clicked:5600,quota_full:3400,config_failed:520,
   referral_entry_seen:9800,referral_link_shared:3920,referral_poster_shared:1640,
   paywall_viewed:10800,plan_selected:6400,wechat_pay_selected:3800,payment_detail_page_viewed:3600,payment_completed:2890,
-  alipay_selected:1200,crypto_pay_selected:400,plan_expired_toast_clicked:1840,payment_detail_page_blocked:800,payment_failed:680,
+  alipay_selected:1200,crypto_pay_selected:400,plan_expired_toast_clicked:1840,payment_detail_page_blocked:800,payment_failed:680,payment_detail_page_load_failed:430,
   task_centre_opened:8200,comment_task_selected:3200,task_initiated:3100,review_page_viewed:2900,proof_submitted:2800,
   binding_task_selected:2100,sharing_task_selected:2600,follow_task_selected:4200,
   support_page_viewed:5600,ticket_submitted:1200,faq_card_clicked:3800,faq_search_used:2400,ticket_list_viewed:900,
@@ -365,12 +373,12 @@ const BASE_COUNTS={
 };
  
 const AVG_TIME={
-  account_created:0.3,onboarding_page_viewed:0.5,onboarding_page_skipped:0.1,home_page_viewed:0.08,email_binded:0.2,referral_code_entered:0.5,app_crashed_relaunched:null,
+  account_created:0.3,onboarding_page_viewed:0.5,onboarding_page_skipped:0.1,home_page_viewed:0.08,email_binded:0.2,referral_code_entered:0.5,app_crashed_relaunched:null,register_failed:null,sign_in_failed:null,
   server_list_viewed:0.05,node_selected:0.08,node_connected:0.01,vpn_session_1min:0.02,vpn_session_10min:0.15,disconnect_clicked:0.03,
-  connect_node_clicked:0.05,node_connection_failed:null,smart_mode_opened:0.1,feedback_submitted:2.0,latency_test_clicked:0.05,quota_full:0.05,
+  connect_node_clicked:0.05,node_connection_failed:null,smart_mode_opened:0.1,feedback_submitted:2.0,latency_test_clicked:0.05,quota_full:0.05,config_failed:null,
   referral_entry_seen:6.0,referral_link_shared:0.5,referral_poster_shared:0.8,
   paywall_viewed:4.0,plan_selected:0.1,wechat_pay_selected:0.08,payment_detail_page_viewed:0.12,payment_completed:0.05,
-  alipay_selected:0.08,crypto_pay_selected:0.1,plan_expired_toast_clicked:720.0,payment_detail_page_blocked:null,payment_failed:null,
+  alipay_selected:0.08,crypto_pay_selected:0.1,plan_expired_toast_clicked:720.0,payment_detail_page_blocked:null,payment_failed:null,payment_detail_page_load_failed:null,
   task_centre_opened:1.5,comment_task_selected:0.15,task_initiated:0.2,review_page_viewed:0.5,proof_submitted:1.0,
   binding_task_selected:0.2,sharing_task_selected:0.2,follow_task_selected:0.2,
   support_page_viewed:2.0,ticket_submitted:5.0,faq_card_clicked:1.5,faq_search_used:2.5,ticket_list_viewed:1.0,
@@ -389,6 +397,8 @@ const DEFAULT_DESCRIPTIONS={
   email_binded:"User linked an email address to their account.",
   referral_code_entered:"User entered a referral code during registration.",
   app_crashed_relaunched:"The app crashed unexpectedly and was relaunched by the user.",
+  register_failed:"User registration failed due to an API error during account creation.",
+  sign_in_failed:"User sign in failed due to an API error during authentication.",
   // Nodes
   server_list_viewed:"User opened the list of available VPN servers.",
   node_selected:"User selected a specific VPN node to connect to.",
@@ -402,6 +412,7 @@ const DEFAULT_DESCRIPTIONS={
   feedback_submitted:"User submitted feedback after a VPN session.",
   latency_test_clicked:"User clicked to run a latency test on a VPN node.",
   quota_full:"User attempted to connect but was blocked because their data quota has been fully consumed.",
+  config_failed:"Node configuration failed to load due to an API error, preventing the VPN connection from being established.",
   // Referral
   referral_entry_seen:"User saw the referral entry point in the app.",
   referral_link_shared:"User shared their unique referral link.",
@@ -417,6 +428,7 @@ const DEFAULT_DESCRIPTIONS={
   plan_expired_toast_clicked:"User clicked the plan expired toast notification to renew.",
   payment_detail_page_blocked:"Payment detail page was blocked, preventing the user from completing payment.",
   payment_failed:"Payment was initiated but did not complete due to a gateway error or network failure.",
+  payment_detail_page_load_failed:"Payment detail page failed to load due to a missing or invalid plan ID, or other frontend validation error.",
   // Tasks
   task_centre_opened:"User opened the Task Centre to view available tasks.",
   comment_task_selected:"User selected a comment-type task to complete.",
@@ -776,7 +788,8 @@ function InlineAddStep({addStep,lang,t,onRowEnter,onRowLeave}){
   const typeOpts=[
     {key:"All",label:"All Types",color:C.muted},
     {key:"pageview",label:"Page Views",color:TYPE_COLORS.pageview},
-    {key:"custom",label:"Custom Events",color:TYPE_COLORS.custom},
+    {key:"custom",label:"Actions",color:TYPE_COLORS.custom},
+    {key:"error",label:"Errors",color:TYPE_COLORS.error},
   ];
   const filtered=ALL_EVENTS.filter(e=>{
     const matchQ=q===""||e.label.toLowerCase().includes(q.toLowerCase())||e.labelZh.includes(q)||e.tag.toLowerCase().includes(q.toLowerCase());
@@ -990,7 +1003,7 @@ function InlineCorrelatedEvents({lang,t,result,steps,onOpenModal}){
  
   const totalUsers=result[0]?result[0].val:1;
   const convertedUsers=result[result.length-1]?result[result.length-1].val:0;
-  const TAG_LIFT_SEED={Registration:1.8,Nodes:2.1,Referral:2.6,Monetisation:3.8,Tasks:2.4,"Image Generation":1.5,Support:1.3,Settings:1.6};
+  const TAG_LIFT_SEED={Registration:1.8,Nodes:2.1,Referral:2.6,Monetisation:3.8,Tasks:2.4,"Image Generation":1.5,Support:1.3,Settings:1.6,Error:1.2};
   const rawConvRate=convertedUsers/totalUsers;
   const MAX_LIFT_SEED=4.0;
   const baseRate=Math.min(rawConvRate, 1/MAX_LIFT_SEED - 0.01);
@@ -2708,7 +2721,8 @@ function EventDefinitionsPage({descriptions,setDescriptions}){
   const typeOpts=[
     {key:"All",label:"All Types"},
     {key:"pageview",label:"Page Views",color:TYPE_COLORS.pageview},
-    {key:"custom",label:"Custom Events",color:TYPE_COLORS.custom},
+    {key:"custom",label:"Actions",color:TYPE_COLORS.custom},
+    {key:"error",label:"Errors",color:TYPE_COLORS.error},
   ];
   const visibleTags=useMemo(()=>["All",...Object.keys(TAG_COLORS)],[]);
   const filtered=useMemo(function(){
@@ -3416,7 +3430,7 @@ function TrendsPage({lang,dateRange}){
                         <input autoFocus value={addSearch} onChange={e=>setAddSearch(e.target.value)} placeholder="Search steps…"
                           style={{width:"100%",padding:"6px 9px",borderRadius:5,border:`1px solid ${C.border2}`,fontSize:11,color:C.text,outline:"none",boxSizing:"border-box"}}/>
                         <div style={{display:"flex",gap:3}}>
-                          {[{key:"All",label:"All Types",color:C.muted},{key:"pageview",label:"Page Views",color:TYPE_COLORS.pageview},{key:"custom",label:"Custom Events",color:TYPE_COLORS.custom}].map(opt=>(
+                          {[{key:"All",label:"All Types",color:C.muted},{key:"pageview",label:"Page Views",color:TYPE_COLORS.pageview},{key:"custom",label:"Actions",color:TYPE_COLORS.custom},{key:"error",label:"Errors",color:TYPE_COLORS.error}].map(opt=>(
                             <button key={opt.key} onClick={()=>setAddTypeFilter(opt.key)}
                               style={{padding:"2px 9px",borderRadius:4,border:`1px solid ${addTypeFilter===opt.key?(opt.color===C.muted?C.accent:opt.color):C.border}`,background:addTypeFilter===opt.key?(opt.color===C.muted?C.accent:opt.color)+"18":"transparent",color:addTypeFilter===opt.key?(opt.color===C.muted?C.accent:opt.color):C.muted,fontSize:10,fontWeight:addTypeFilter===opt.key?700:400,cursor:"pointer"}}>
                               {opt.label}
